@@ -165,18 +165,21 @@ class _CategoryListPageState extends State<CategoryListPage>
   }
 
   InputDecoration _inputDecoration(String label) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Color(0xFF1f2967)),
+      labelStyle: TextStyle(color: colorScheme.primary),
       filled: true,
-      fillColor: Colors.grey.shade100,
+      fillColor: colorScheme.surface,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Color(0xFF1f2967), width: 2),
+        borderSide: BorderSide(color: colorScheme.primary, width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
     );
@@ -184,8 +187,12 @@ class _CategoryListPageState extends State<CategoryListPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: colorScheme.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -197,14 +204,14 @@ class _CategoryListPageState extends State<CategoryListPage>
             iconTheme: const IconThemeData(color: Colors.white),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF7475d6),
-                      Color.fromARGB(255, 161, 161, 212),
-                    ],
+                    colors:[
+                            const Color(0xFF7475d6),
+                            const Color.fromARGB(255, 161, 161, 212),
+                          ]
                   ),
                 ),
                 child: Stack(
@@ -278,10 +285,9 @@ class _CategoryListPageState extends State<CategoryListPage>
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _isFormVisible
-                                ? Colors.grey[600]
-                                : const Color(0xFF7475d6),
+                        backgroundColor: _isFormVisible
+                            ? (isDark ? Colors.grey[700] : Colors.grey[600])
+                            : colorScheme.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -297,70 +303,63 @@ class _CategoryListPageState extends State<CategoryListPage>
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     height: _isFormVisible ? null : 0,
-                    child:
-                        _isFormVisible
-                            ? Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                children: [
-                                  TextField(
-                                    controller: nameCtrl,
-                                    decoration: _inputDecoration(
-                                      'Category Name',
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  TextField(
-                                    controller: descCtrl,
-                                    decoration: _inputDecoration('Description'),
-                                    maxLines: 3,
-                                  ),
-                                  const SizedBox(height: 18),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                      onPressed: _saveCategory,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFF1f2967,
-                                        ),
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 16,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                        ),
-                                        elevation: 6,
+                    child: _isFormVisible
+                        ? Container(
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                TextField(
+                                  controller: nameCtrl,
+                                  decoration: _inputDecoration('Category Name'),
+                                  style: TextStyle(color: colorScheme.onSurface),
+                                ),
+                                const SizedBox(height: 14),
+                                TextField(
+                                  controller: descCtrl,
+                                  decoration: _inputDecoration('Description'),
+                                  maxLines: 3,
+                                  style: TextStyle(color: colorScheme.onSurface),
+                                ),
+                                const SizedBox(height: 18),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _saveCategory,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: colorScheme.primary,
+                                      foregroundColor: colorScheme.onPrimary,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
                                       ),
-                                      child: Text(
-                                        selectedCategoryId == null
-                                            ? 'Add Category'
-                                            : 'Update Category',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      elevation: 6,
+                                    ),
+                                    child: Text(
+                                      selectedCategoryId == null
+                                          ? 'Add Category'
+                                          : 'Update Category',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            )
-                            : const SizedBox.shrink(),
+                                ),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                   if (_isFormVisible) const SizedBox(height: 16),
 
@@ -382,14 +381,16 @@ class _CategoryListPageState extends State<CategoryListPage>
                           _searchQuery = value;
                         });
                       },
+                      style: TextStyle(color: colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: 'Search categories...',
-                        prefixIcon: const Icon(
+                        hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                        prefixIcon: Icon(
                           Icons.search,
-                          color: Colors.grey,
+                          color: theme.textTheme.bodyMedium?.color,
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: colorScheme.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 15,
@@ -400,8 +401,8 @@ class _CategoryListPageState extends State<CategoryListPage>
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF1f2967),
+                          borderSide: BorderSide(
+                            color: colorScheme.primary,
                             width: 1,
                           ),
                         ),
@@ -414,17 +415,17 @@ class _CategoryListPageState extends State<CategoryListPage>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Categories',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: colorScheme.onBackground,
                         ),
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -444,10 +445,7 @@ class _CategoryListPageState extends State<CategoryListPage>
                               },
                               icon: Icon(
                                 Icons.view_list,
-                                color:
-                                    !_isGridView
-                                        ? const Color(0xFF1f2967)
-                                        : Colors.grey,
+                                color: !_isGridView ? colorScheme.primary : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                             IconButton(
@@ -458,10 +456,7 @@ class _CategoryListPageState extends State<CategoryListPage>
                               },
                               icon: Icon(
                                 Icons.grid_view,
-                                color:
-                                    _isGridView
-                                        ? const Color(0xFF1f2967)
-                                        : Colors.grey,
+                                color: _isGridView ? colorScheme.primary : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ],
@@ -478,9 +473,11 @@ class _CategoryListPageState extends State<CategoryListPage>
               future: _categoriesFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SizedBox(
+                  return SizedBox(
                     height: 300,
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(
+                      child: CircularProgressIndicator(color: colorScheme.primary),
+                    ),
                   );
                 }
                 if (snapshot.hasError) {
@@ -488,7 +485,7 @@ class _CategoryListPageState extends State<CategoryListPage>
                     height: 300,
                     margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red[50],
+                      color: isDark ? Colors.red.withOpacity(0.1) : Colors.red[50],
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Center(
@@ -540,14 +537,14 @@ class _CategoryListPageState extends State<CategoryListPage>
                           Icon(
                             Icons.search_off,
                             size: 60,
-                            color: Colors.grey[400],
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'No categories found',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.grey[600],
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -558,10 +555,9 @@ class _CategoryListPageState extends State<CategoryListPage>
 
                 return FadeTransition(
                   opacity: _fadeAnimation,
-                  child:
-                      _isGridView
-                          ? _buildGridView(filteredCategories)
-                          : _buildListView(filteredCategories),
+                  child: _isGridView
+                      ? _buildGridView(filteredCategories)
+                      : _buildListView(filteredCategories),
                 );
               },
             ),
@@ -572,11 +568,15 @@ class _CategoryListPageState extends State<CategoryListPage>
   }
 
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 400,
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -594,8 +594,10 @@ class _CategoryListPageState extends State<CategoryListPage>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                      : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
                 ),
                 borderRadius: BorderRadius.circular(60),
               ),
@@ -606,18 +608,18 @@ class _CategoryListPageState extends State<CategoryListPage>
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'No Categories Yet',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'No categories created yet.\nAdd the first one!',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 16, color: theme.textTheme.bodyMedium?.color),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -630,8 +632,8 @@ class _CategoryListPageState extends State<CategoryListPage>
               icon: const Icon(Icons.add),
               label: const Text('Create Category'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1f2967),
-                foregroundColor: Colors.white,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
@@ -689,9 +691,12 @@ class _CategoryListPageState extends State<CategoryListPage>
   }
 
   Widget _buildCategoryCard(Map<String, dynamic> category, bool isGrid) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -706,6 +711,10 @@ class _CategoryListPageState extends State<CategoryListPage>
   }
 
   Widget _buildListCard(Map<String, dynamic> category) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -716,8 +725,10 @@ class _CategoryListPageState extends State<CategoryListPage>
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                    : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
               ),
               borderRadius: BorderRadius.circular(15),
             ),
@@ -732,10 +743,10 @@ class _CategoryListPageState extends State<CategoryListPage>
               children: [
                 Text(
                   category['name'] ?? 'No Name',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -743,7 +754,7 @@ class _CategoryListPageState extends State<CategoryListPage>
                 const SizedBox(height: 4),
                 Text(
                   category['description'] ?? 'No description',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 14, color: theme.textTheme.bodyMedium?.color),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -763,34 +774,33 @@ class _CategoryListPageState extends State<CategoryListPage>
                   break;
               }
             },
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: ListTile(
-                      leading: Icon(Icons.edit, color: Colors.blue),
-                      title: Text('Edit Category'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: ListTile(
-                      leading: Icon(Icons.delete, color: Colors.red),
-                      title: Text('Delete Category'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ],
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'edit',
+                child: ListTile(
+                  leading: Icon(Icons.edit, color: Colors.blue),
+                  title: Text('Edit Category'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: ListTile(
+                  leading: Icon(Icons.delete, color: Colors.red),
+                  title: Text('Delete Category'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF1f2967).withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.more_vert,
-                color: Color(0xFF1f2967),
+                color: colorScheme.primary,
                 size: 20,
               ),
             ),
@@ -801,6 +811,10 @@ class _CategoryListPageState extends State<CategoryListPage>
   }
 
   Widget _buildGridCard(Map<String, dynamic> category) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -812,8 +826,10 @@ class _CategoryListPageState extends State<CategoryListPage>
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                      : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -825,10 +841,10 @@ class _CategoryListPageState extends State<CategoryListPage>
           // Category Info
           Text(
             category['name'] ?? 'No Name',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: colorScheme.onSurface,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -837,7 +853,7 @@ class _CategoryListPageState extends State<CategoryListPage>
           const SizedBox(height: 8),
           Text(
             category['description'] ?? 'No description',
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 12, color: theme.textTheme.bodyMedium?.color),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
@@ -857,39 +873,38 @@ class _CategoryListPageState extends State<CategoryListPage>
               }
             },
             offset: const Offset(0, -80),
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: ListTile(
-                      leading: Icon(Icons.edit, color: Colors.blue),
-                      title: Text('Edit'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: ListTile(
-                      leading: Icon(Icons.delete, color: Colors.red),
-                      title: Text('Delete'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ],
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'edit',
+                child: ListTile(
+                  leading: Icon(Icons.edit, color: Colors.blue),
+                  title: Text('Edit'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: ListTile(
+                  leading: Icon(Icons.delete, color: Colors.red),
+                  title: Text('Delete'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF1f2967).withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
+              child: Text(
                 'Manage',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1f2967),
+                  color: colorScheme.primary,
                 ),
               ),
             ),
@@ -900,124 +915,130 @@ class _CategoryListPageState extends State<CategoryListPage>
   }
 
   void _showDeleteBottomSheet(Map<String, dynamic> category) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder:
-          (context) => Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.textTheme.bodyMedium?.color,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            const SizedBox(height: 24),
+
+            // Warning icon
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const Icon(
+                Icons.warning_rounded,
+                color: Colors.red,
+                size: 30,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Title
+            Text(
+              'Delete Category?',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Content
+            Text(
+              'Are you sure you want to delete "${category['name']}"?\n\nThis action cannot be undone.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: theme.textTheme.bodyMedium?.color,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Buttons
+            Row(
               children: [
-                // Handle bar
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Warning icon
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: const Icon(
-                    Icons.warning_rounded,
-                    color: Colors.red,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Title
-                const Text(
-                  'Delete Category?',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-
-                // Content
-                Text(
-                  'Are you sure you want to delete "${category['name']}"?\n\nThis action cannot be undone.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: Colors.grey[300]!),
-                          ),
-                        ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: theme.textTheme.bodyMedium?.color ?? Colors.grey),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _deleteCategory(category['id']);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'Delete',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-
-                // Bottom padding for safe area
-                SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _deleteCategory(category['id']);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
+
+            // Bottom padding for safe area
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+          ],
+        ),
+      ),
     );
   }
 }

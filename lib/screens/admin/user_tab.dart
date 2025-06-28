@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mobile_edu/components/theme_toggle_button.dart';
 
 class UsersTab extends StatefulWidget {
   const UsersTab({super.key});
@@ -69,10 +70,12 @@ class _UsersTabState extends State<UsersTab>
 
   @override
   Widget build(BuildContext context) {
-    const mainColor = Color(0xFF1f2967);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: colorScheme.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -84,19 +87,26 @@ class _UsersTabState extends State<UsersTab>
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF7475d6),
-                      const Color.fromARGB(255, 161, 161, 212),
-                    ],
+                    colors:  [
+                            const Color(0xFF7475d6),
+                            const Color.fromARGB(255, 161, 161, 212),
+                          ]
                   ),
                 ),
-                child: const Stack(
+                child: Stack(
                   children: [
+                    // Theme toggle button
                     Positioned(
+                      top: 40,
+                      right: 20,
+                      child: ThemeToggleButton(),
+                    ),
+                    // Title and description
+                    const Positioned(
                       bottom: 30,
                       left: 24,
                       right: 24,
@@ -149,14 +159,16 @@ class _UsersTabState extends State<UsersTab>
                           _searchQuery = value;
                         });
                       },
+                      style: TextStyle(color: colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: 'Search users by email or ID...',
-                        prefixIcon: const Icon(
+                        hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                        prefixIcon: Icon(
                           Icons.search,
-                          color: Colors.grey,
+                          color: theme.textTheme.bodyMedium?.color,
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: colorScheme.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 15,
@@ -167,8 +179,8 @@ class _UsersTabState extends State<UsersTab>
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: const BorderSide(
-                            color: mainColor,
+                          borderSide: BorderSide(
+                            color: colorScheme.primary,
                             width: 1,
                           ),
                         ),
@@ -176,7 +188,6 @@ class _UsersTabState extends State<UsersTab>
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   // Filters and View Toggle Row
                   Row(
                     children: [
@@ -189,7 +200,7 @@ class _UsersTabState extends State<UsersTab>
                               return Container(
                                 height: 50,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: colorScheme.surface,
                                   borderRadius: BorderRadius.circular(10),
                                   boxShadow: [
                                     BoxShadow(
@@ -199,19 +210,19 @@ class _UsersTabState extends State<UsersTab>
                                     ),
                                   ],
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
+                                    color: colorScheme.primary,
                                   ),
                                 ),
                               );
                             }
 
                             final roleOptions = _getRoleOptions(snapshot.data!);
-
                             return Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: colorScheme.surface,
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
@@ -228,37 +239,38 @@ class _UsersTabState extends State<UsersTab>
                                     _selectedRole = value!;
                                   });
                                 },
+                                style: TextStyle(color: colorScheme.onSurface),
+                                dropdownColor: colorScheme.surface,
                                 decoration: InputDecoration(
                                   labelText: 'Filter by Role',
-                                  prefixIcon: const Icon(
+                                  labelStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                                  prefixIcon: Icon(
                                     Icons.filter_list,
-                                    color: mainColor,
+                                    color: colorScheme.primary,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide: BorderSide.none,
                                   ),
                                   filled: true,
-                                  fillColor: Colors.white,
+                                  fillColor: colorScheme.surface,
                                 ),
-                                items:
-                                    roleOptions.map((role) {
-                                      return DropdownMenuItem<String>(
-                                        value: role,
-                                        child: Text(role),
-                                      );
-                                    }).toList(),
+                                items: roleOptions.map((role) {
+                                  return DropdownMenuItem<String>(
+                                    value: role,
+                                    child: Text(role, style: TextStyle(color: colorScheme.onSurface)),
+                                  );
+                                }).toList(),
                               ),
                             );
                           },
                         ),
                       ),
                       const SizedBox(width: 12),
-
                       // View Toggle
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -278,7 +290,7 @@ class _UsersTabState extends State<UsersTab>
                               },
                               icon: Icon(
                                 Icons.view_list,
-                                color: !_isGridView ? mainColor : Colors.grey,
+                                color: !_isGridView ? colorScheme.primary : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                             IconButton(
@@ -289,7 +301,7 @@ class _UsersTabState extends State<UsersTab>
                               },
                               icon: Icon(
                                 Icons.grid_view,
-                                color: _isGridView ? mainColor : Colors.grey,
+                                color: _isGridView ? colorScheme.primary : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ],
@@ -298,7 +310,6 @@ class _UsersTabState extends State<UsersTab>
                     ],
                   ),
                   const SizedBox(height: 16),
-
                   // Header with Stats
                   FutureBuilder<List<dynamic>>(
                     future: _usersFuture,
@@ -306,16 +317,15 @@ class _UsersTabState extends State<UsersTab>
                       if (!snapshot.hasData) return const SizedBox.shrink();
 
                       final filteredUsers = _filterUsers(snapshot.data!);
-
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             'Users (${filteredUsers.length})',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                              color: colorScheme.onBackground,
                             ),
                           ),
                           Container(
@@ -324,15 +334,15 @@ class _UsersTabState extends State<UsersTab>
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: mainColor.withOpacity(0.1),
+                              color: colorScheme.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               'Total: ${snapshot.data!.length}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: mainColor,
+                                color: colorScheme.primary,
                               ),
                             ),
                           ),
@@ -349,9 +359,11 @@ class _UsersTabState extends State<UsersTab>
               future: _usersFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SizedBox(
+                  return SizedBox(
                     height: 300,
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(
+                      child: CircularProgressIndicator(color: colorScheme.primary),
+                    ),
                   );
                 }
 
@@ -360,7 +372,7 @@ class _UsersTabState extends State<UsersTab>
                     height: 300,
                     margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red[50],
+                      color: isDark ? Colors.red.withOpacity(0.1) : Colors.red[50],
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Center(
@@ -413,14 +425,14 @@ class _UsersTabState extends State<UsersTab>
                           Icon(
                             Icons.search_off,
                             size: 60,
-                            color: Colors.grey[400],
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'No users found',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.grey[600],
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -428,7 +440,7 @@ class _UsersTabState extends State<UsersTab>
                             'Try adjusting your search or filter',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[500],
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -439,10 +451,9 @@ class _UsersTabState extends State<UsersTab>
 
                 return FadeTransition(
                   opacity: _fadeAnimation,
-                  child:
-                      _isGridView
-                          ? _buildGridView(filteredUsers)
-                          : _buildListView(filteredUsers),
+                  child: _isGridView
+                      ? _buildGridView(filteredUsers)
+                      : _buildListView(filteredUsers),
                 );
               },
             ),
@@ -453,11 +464,15 @@ class _UsersTabState extends State<UsersTab>
   }
 
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 400,
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -475,8 +490,10 @@ class _UsersTabState extends State<UsersTab>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                      : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
                 ),
                 borderRadius: BorderRadius.circular(60),
               ),
@@ -487,18 +504,18 @@ class _UsersTabState extends State<UsersTab>
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'No Users Found',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'No registered users available\nat the moment.',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 16, color: theme.textTheme.bodyMedium?.color),
               textAlign: TextAlign.center,
             ),
           ],
@@ -549,11 +566,12 @@ class _UsersTabState extends State<UsersTab>
   }
 
   Widget _buildUserCard(Map<String, dynamic> user, bool isGrid) {
-    const mainColor = Color(0xFF1f2967);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -568,7 +586,9 @@ class _UsersTabState extends State<UsersTab>
   }
 
   Widget _buildListCard(Map<String, dynamic> user) {
-    const mainColor = Color(0xFF1f2967);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -579,15 +599,16 @@ class _UsersTabState extends State<UsersTab>
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [mainColor, Color(0xFF4a5394)],
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                    : [colorScheme.primary, const Color(0xFF4a5394)],
               ),
               borderRadius: BorderRadius.circular(15),
             ),
             child: const Icon(Icons.person, color: Colors.white, size: 30),
           ),
           const SizedBox(width: 16),
-
           // User Info
           Expanded(
             child: Column(
@@ -595,17 +616,17 @@ class _UsersTabState extends State<UsersTab>
               children: [
                 Text(
                   user['email'] ?? 'No Email',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'ID: ${user['id']}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: theme.textTheme.bodyMedium?.color),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
@@ -630,7 +651,6 @@ class _UsersTabState extends State<UsersTab>
               ],
             ),
           ),
-
           // Action Button
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -639,39 +659,37 @@ class _UsersTabState extends State<UsersTab>
                   _showUserDetails(user);
                   break;
                 case 'edit':
-                  // Add edit functionality
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Edit feature coming soon')),
                   );
                   break;
               }
             },
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'view',
-                    child: ListTile(
-                      leading: Icon(Icons.visibility, color: Colors.blue),
-                      title: Text('View Details'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: ListTile(
-                      leading: Icon(Icons.edit, color: Colors.orange),
-                      title: Text('Edit User'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ],
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'view',
+                child: ListTile(
+                  leading: Icon(Icons.visibility, color: Colors.blue),
+                  title: Text('View Details'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'edit',
+                child: ListTile(
+                  leading: Icon(Icons.edit, color: Colors.orange),
+                  title: Text('Edit User'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: mainColor.withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.more_vert, color: mainColor, size: 20),
+              child: Icon(Icons.more_vert, color: colorScheme.primary, size: 20),
             ),
           ),
         ],
@@ -680,7 +698,9 @@ class _UsersTabState extends State<UsersTab>
   }
 
   Widget _buildGridCard(Map<String, dynamic> user) {
-    const mainColor = Color(0xFF1f2967);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -691,22 +711,23 @@ class _UsersTabState extends State<UsersTab>
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [mainColor, Color(0xFF4a5394)],
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                    : [colorScheme.primary, const Color(0xFF4a5394)],
               ),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Icon(Icons.person, color: Colors.white, size: 40),
           ),
           const SizedBox(height: 12),
-
           // User Info
           Text(
             user['email'] ?? 'No Email',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: colorScheme.onSurface,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -715,7 +736,7 @@ class _UsersTabState extends State<UsersTab>
           const SizedBox(height: 4),
           Text(
             'ID: ${user['id']}',
-            style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 10, color: theme.textTheme.bodyMedium?.color),
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
           ),
@@ -736,7 +757,6 @@ class _UsersTabState extends State<UsersTab>
             ),
           ),
           const Spacer(),
-
           // Action Button
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -752,39 +772,38 @@ class _UsersTabState extends State<UsersTab>
               }
             },
             offset: const Offset(0, -120),
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'view',
-                    child: ListTile(
-                      leading: Icon(Icons.visibility, color: Colors.blue),
-                      title: Text('View'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: ListTile(
-                      leading: Icon(Icons.edit, color: Colors.orange),
-                      title: Text('Edit'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ],
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'view',
+                child: ListTile(
+                  leading: Icon(Icons.visibility, color: Colors.blue),
+                  title: Text('View'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'edit',
+                child: ListTile(
+                  leading: Icon(Icons.edit, color: Colors.orange),
+                  title: Text('Edit'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: mainColor.withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
+              child: Text(
                 'Manage',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: mainColor,
+                  color: colorScheme.primary,
                 ),
               ),
             ),
@@ -811,94 +830,94 @@ class _UsersTabState extends State<UsersTab>
   }
 
   void _showUserDetails(Map<String, dynamic> user) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder:
-          (context) => Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.textTheme.bodyMedium?.color,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Handle bar
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+            const SizedBox(height: 24),
+            // User Avatar
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
                 ),
-                const SizedBox(height: 24),
-
-                // User Avatar
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // User Details
-                Text(
-                  'User Details',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                _buildDetailRow('Email', user['email'] ?? 'No Email'),
-                _buildDetailRow('ID', user['id'] ?? 'No ID'),
-                _buildDetailRow('Role', user['role'] ?? 'No Role'),
-
-                const SizedBox(height: 24),
-
-                // Close Button
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1f2967),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                  child: const Text('Close'),
-                ),
-
-                // Bottom padding for safe area
-                SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
-              ],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(
+                Icons.person,
+                color: Colors.white,
+                size: 40,
+              ),
             ),
-          ),
+            const SizedBox(height: 16),
+            // User Details
+            Text(
+              'User Details',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildDetailRow('Email', user['email'] ?? 'No Email'),
+            _buildDetailRow('ID', user['id'] ?? 'No ID'),
+            _buildDetailRow('Role', user['role'] ?? 'No Role'),
+            const SizedBox(height: 24),
+            // Close Button
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+              child: const Text('Close'),
+            ),
+            // Bottom padding for safe area
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildDetailRow(String label, String value) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -908,14 +927,17 @@ class _UsersTabState extends State<UsersTab>
             width: 60,
             child: Text(
               '$label:',
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.grey,
+                color: theme.textTheme.bodyMedium?.color,
               ),
             ),
           ),
           Expanded(
-            child: Text(value, style: const TextStyle(color: Colors.black87)),
+            child: Text(
+              value,
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
           ),
         ],
       ),

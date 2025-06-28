@@ -141,18 +141,22 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
   }
 
   Widget _buildRatingDistribution() {
+    final theme = Theme.of(context);
+
     return Column(
       children: List.generate(5, (index) {
         int starCount = 5 - index;
         int reviewCount = _ratingDistribution[starCount] ?? 0;
-        double percentage =
-            _totalReviews > 0 ? reviewCount / _totalReviews : 0.0;
+        double percentage = _totalReviews > 0 ? reviewCount / _totalReviews : 0.0;
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 2),
           child: Row(
             children: [
-              Text('$starCount'),
+              Text(
+                '$starCount',
+                style: TextStyle(color: theme.textTheme.bodyMedium?.color),
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: LinearProgressIndicator(
@@ -164,7 +168,10 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
               const SizedBox(width: 8),
               Text(
                 '$reviewCount',
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: theme.textTheme.bodyMedium?.color,
+                ),
               ),
             ],
           ),
@@ -174,11 +181,14 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
   }
 
   Widget _buildReviewItem(dynamic review) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -195,12 +205,12 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: Colors.blue[100],
+                backgroundColor: colorScheme.primary.withOpacity(0.1),
                 child: Text(
                   _getUserInitial(review['user_id']),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1f2967),
+                    color: colorScheme.primary,
                   ),
                 ),
               ),
@@ -211,7 +221,10 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
                   children: [
                     Text(
                       _getUserDisplayName(review['user_id']),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                     Row(
                       children: [
@@ -220,7 +233,7 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
                         Text(
                           _formatDate(review['created_at'] ?? ''),
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: theme.textTheme.bodyMedium?.color,
                             fontSize: 12,
                           ),
                         ),
@@ -232,18 +245,36 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
             ],
           ),
           const SizedBox(height: 12),
-          Text(review['comment'] ?? '', style: const TextStyle(height: 1.5)),
+          Text(
+            review['comment'] ?? '',
+            style: TextStyle(
+              height: 1.5,
+              color: colorScheme.onSurface,
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildReviewsHeader() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.blue[50]!, Colors.purple[50]!],
+          colors: isDark
+              ? [
+                  colorScheme.primary.withOpacity(0.1),
+                  colorScheme.secondary.withOpacity(0.1),
+                ]
+              : [
+                  Colors.blue[50]!,
+                  Colors.purple[50]!,
+                ],
         ),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -253,18 +284,16 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
             children: [
               Text(
                 _averageRating.toStringAsFixed(1),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1f2967),
+                  color: colorScheme.primary,
                 ),
               ),
               Row(
                 children: List.generate(5, (index) {
                   return Icon(
-                    index < _averageRating.round()
-                        ? Icons.star
-                        : Icons.star_border,
+                    index < _averageRating.round() ? Icons.star : Icons.star_border,
                     color: Colors.amber,
                     size: 20,
                   );
@@ -272,7 +301,10 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
               ),
               Text(
                 '$_totalReviews reviews',
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                style: TextStyle(
+                  color: theme.textTheme.bodyMedium?.color,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -284,6 +316,9 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
   }
 
   Widget _buildReviewsTab() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Stack(
       children: [
         RefreshIndicator(
@@ -295,29 +330,31 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
               children: [
                 _buildReviewsHeader(),
                 const SizedBox(height: 24),
-
                 if (_isLoading)
-                  const Center(
+                  Center(
                     child: Padding(
-                      padding: EdgeInsets.all(20),
-                      child: CircularProgressIndicator(),
+                      padding: const EdgeInsets.all(20),
+                      child: CircularProgressIndicator(color: colorScheme.primary),
                     ),
                   )
                 else if (_reviews.isEmpty)
                   Container(
                     padding: const EdgeInsets.all(20),
-                    child: const Center(
+                    child: Center(
                       child: Column(
                         children: [
                           Icon(
                             Icons.rate_review_outlined,
                             size: 64,
-                            color: Colors.grey,
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           Text(
                             'Belum ada review untuk kursus ini',
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
+                            style: TextStyle(
+                              color: theme.textTheme.bodyMedium?.color,
+                              fontSize: 16,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -330,7 +367,6 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
             ),
           ),
         ),
-
         if (widget.isEnrolled)
           Positioned(
             right: 16,
@@ -351,28 +387,25 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder:
-                      (_) => ReviewForm(
-                        courseId: widget.courseId,
-                        userId: user.id,
-                        onSubmitted: () async {
-                          await _fetchReviews();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Review berhasil dikirim."),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        },
-                      ),
+                  builder: (_) => ReviewForm(
+                    courseId: widget.courseId,
+                    userId: user.id,
+                    onSubmitted: () async {
+                      await _fetchReviews();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Review berhasil dikirim."),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
-              backgroundColor: const Color(0xFF1f2967),
-              icon: const Icon(Icons.rate_review, color: Colors.white),
-              label: const Text(
-                "Tulis Review",
-                style: TextStyle(color: Colors.white),
-              ),
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              icon: const Icon(Icons.rate_review),
+              label: const Text("Tulis Review"),
             ),
           ),
       ],

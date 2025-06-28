@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:mobile_edu/components/theme_toggle_button.dart';
 import 'topic_form_page.dart';
 
 class TopicListPage extends StatefulWidget {
@@ -104,8 +105,12 @@ class _TopicListPageState extends State<TopicListPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: colorScheme.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -115,6 +120,12 @@ class _TopicListPageState extends State<TopicListPage>
             elevation: 0,
             backgroundColor: Colors.transparent,
             iconTheme: const IconThemeData(color: Colors.white),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16, top: 8),
+                child: ThemeToggleButton(),
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: const BoxDecoration(
@@ -122,8 +133,8 @@ class _TopicListPageState extends State<TopicListPage>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF7475d6),
-                      const Color.fromARGB(255, 161, 161, 212),
+                      Color(0xFF7475d6),
+                      Color.fromARGB(255, 161, 161, 212),
                     ],
                   ),
                 ),
@@ -201,7 +212,7 @@ class _TopicListPageState extends State<TopicListPage>
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7475d6),
+                        backgroundColor: colorScheme.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -231,14 +242,16 @@ class _TopicListPageState extends State<TopicListPage>
                           _searchQuery = value;
                         });
                       },
+                      style: TextStyle(color: colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: 'Search topics...',
-                        prefixIcon: const Icon(
+                        hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                        prefixIcon: Icon(
                           Icons.search,
-                          color: Colors.grey,
+                          color: theme.textTheme.bodyMedium?.color,
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: colorScheme.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 15,
@@ -249,8 +262,8 @@ class _TopicListPageState extends State<TopicListPage>
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF1f2967),
+                          borderSide: BorderSide(
+                            color: colorScheme.primary,
                             width: 1,
                           ),
                         ),
@@ -263,17 +276,17 @@ class _TopicListPageState extends State<TopicListPage>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Topic List',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: colorScheme.onBackground,
                         ),
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -295,8 +308,8 @@ class _TopicListPageState extends State<TopicListPage>
                                 Icons.view_list,
                                 color:
                                     !_isGridView
-                                        ? const Color(0xFF1f2967)
-                                        : Colors.grey,
+                                        ? colorScheme.primary
+                                        : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                             IconButton(
@@ -309,8 +322,8 @@ class _TopicListPageState extends State<TopicListPage>
                                 Icons.grid_view,
                                 color:
                                     _isGridView
-                                        ? const Color(0xFF1f2967)
-                                        : Colors.grey,
+                                        ? colorScheme.primary
+                                        : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ],
@@ -327,9 +340,11 @@ class _TopicListPageState extends State<TopicListPage>
               future: _topicsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SizedBox(
+                  return SizedBox(
                     height: 300,
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(
+                      child: CircularProgressIndicator(color: colorScheme.primary),
+                    ),
                   );
                 }
                 if (snapshot.hasError) {
@@ -337,7 +352,7 @@ class _TopicListPageState extends State<TopicListPage>
                     height: 300,
                     margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red[50],
+                      color: isDark ? Colors.red.withOpacity(0.1) : Colors.red[50],
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Center(
@@ -389,14 +404,14 @@ class _TopicListPageState extends State<TopicListPage>
                           Icon(
                             Icons.search_off,
                             size: 60,
-                            color: Colors.grey[400],
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'No topics found',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.grey[600],
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -421,11 +436,15 @@ class _TopicListPageState extends State<TopicListPage>
   }
 
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 400,
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -443,8 +462,10 @@ class _TopicListPageState extends State<TopicListPage>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                      : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
                 ),
                 borderRadius: BorderRadius.circular(60),
               ),
@@ -455,18 +476,18 @@ class _TopicListPageState extends State<TopicListPage>
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'No Topics Yet',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'No topics for this course yet.\nAdd the first one!',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 16, color: theme.textTheme.bodyMedium?.color),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -485,7 +506,7 @@ class _TopicListPageState extends State<TopicListPage>
               icon: const Icon(Icons.add),
               label: const Text('Create Topic'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1f2967),
+                backgroundColor: colorScheme.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
@@ -553,9 +574,12 @@ class _TopicListPageState extends State<TopicListPage>
             )
             : null;
 
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -573,6 +597,10 @@ class _TopicListPageState extends State<TopicListPage>
   }
 
   Widget _buildListCard(Map<String, dynamic> topic, String? thumbnailUrl) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -593,12 +621,12 @@ class _TopicListPageState extends State<TopicListPage>
                             height: 80,
                             width: 120,
                             decoration: BoxDecoration(
-                              color: Colors.grey[200],
+                              color: isDark ? Colors.grey[800] : Colors.grey[200],
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Icon(
                               Icons.broken_image,
-                              color: Colors.grey[400],
+                              color: isDark ? Colors.grey[600] : Colors.grey[400],
                             ),
                           ),
                     )
@@ -606,8 +634,10 @@ class _TopicListPageState extends State<TopicListPage>
                       height: 80,
                       width: 120,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                              : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
                         ),
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -631,25 +661,25 @@ class _TopicListPageState extends State<TopicListPage>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1f2967).withOpacity(0.1),
+                    color: colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     'Topic ${topic['order_no']}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1f2967),
+                      color: colorScheme.primary,
                     ),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   topic['title'] ?? 'No Title',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -657,7 +687,7 @@ class _TopicListPageState extends State<TopicListPage>
                 const SizedBox(height: 4),
                 Text(
                   topic['description'] ?? 'No description.',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 14, color: theme.textTheme.bodyMedium?.color),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -765,12 +795,12 @@ class _TopicListPageState extends State<TopicListPage>
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF1f2967).withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.more_vert,
-                color: Color(0xFF1f2967),
+                color: colorScheme.primary,
                 size: 20,
               ),
             ),
@@ -781,6 +811,10 @@ class _TopicListPageState extends State<TopicListPage>
   }
 
   Widget _buildGridCard(Map<String, dynamic> topic, String? thumbnailUrl) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -807,18 +841,20 @@ class _TopicListPageState extends State<TopicListPage>
                             height: double.infinity,
                             errorBuilder:
                                 (context, error, stackTrace) => Container(
-                                  color: Colors.grey[200],
+                                  color: isDark ? Colors.grey[800] : Colors.grey[200],
                                   child: Icon(
                                     Icons.broken_image,
-                                    color: Colors.grey[400],
+                                    color: isDark ? Colors.grey[600] : Colors.grey[400],
                                     size: 40,
                                   ),
                                 ),
                           )
                           : Container(
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+                                colors: isDark
+                                    ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                                    : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
                               ),
                             ),
                             child: const Center(
@@ -867,10 +903,10 @@ class _TopicListPageState extends State<TopicListPage>
               children: [
                 Text(
                   topic['title'] ?? 'No Title',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -878,7 +914,7 @@ class _TopicListPageState extends State<TopicListPage>
                 const SizedBox(height: 4),
                 Text(
                   topic['description'] ?? 'No description.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: theme.textTheme.bodyMedium?.color),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -953,16 +989,16 @@ class _TopicListPageState extends State<TopicListPage>
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1f2967).withOpacity(0.1),
+                      color: colorScheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Manage',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1f2967),
+                        color: colorScheme.primary,
                       ),
                     ),
                   ),
@@ -976,15 +1012,18 @@ class _TopicListPageState extends State<TopicListPage>
   }
 
   void _showDeleteBottomSheet(Map<String, dynamic> topic) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder:
           (context) => Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
               ),
@@ -998,7 +1037,7 @@ class _TopicListPageState extends State<TopicListPage>
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: theme.textTheme.bodyMedium?.color,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1021,9 +1060,13 @@ class _TopicListPageState extends State<TopicListPage>
                 const SizedBox(height: 16),
 
                 // Title
-                const Text(
+                Text(
                   'Delete Topic?',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 12),
 
@@ -1033,7 +1076,7 @@ class _TopicListPageState extends State<TopicListPage>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
+                    color: theme.textTheme.bodyMedium?.color,
                     height: 1.5,
                   ),
                 ),
@@ -1049,7 +1092,7 @@ class _TopicListPageState extends State<TopicListPage>
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: Colors.grey[300]!),
+                            side: BorderSide(color: theme.textTheme.bodyMedium?.color ?? Colors.grey),
                           ),
                         ),
                         child: const Text(

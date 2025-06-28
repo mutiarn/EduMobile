@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_edu/providers/theme_provider.dart';
 import 'package:mobile_edu/screens/siswa/course_card_widget.dart';
 import 'package:mobile_edu/screens/siswa/home_siswa.dart';
 import 'package:mobile_edu/screens/siswa/promo_card.dart';
@@ -80,9 +82,11 @@ class _HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,8 +98,8 @@ class _HomeTabState extends State<HomeTab> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    const Color(0xFF7475d6),
-                    const Color.fromARGB(255, 161, 161, 212),
+                    Color(0xFF7475d6), // Preserve this color
+                    Color.fromARGB(255, 161, 161, 212),
                   ],
                 ),
                 borderRadius: BorderRadius.only(
@@ -132,6 +136,9 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   Widget _buildHeader(BuildContext context, User? user) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final container = ProviderScope.containerOf(context);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 0),
       child: Row(
@@ -155,24 +162,45 @@ class _HomeTabState extends State<HomeTab> {
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
+          Row(
+          children: [
+            // 🌙 Theme toggle (tanpa container)
+            IconButton(
+              icon: Icon(
+                isDark ? Icons.light_mode : Icons.dark_mode,
+                color: Colors.white,
+                size: 24,
+              ),
+              onPressed: () {
+                container.read(themeModeProvider.notifier).state =
+                    isDark ? ThemeMode.light : ThemeMode.dark;
+              },
             ),
-            child: const Icon(
-              Icons.notifications_outlined,
-              color: Colors.white,
-              size: 24,
+            const SizedBox(width: 8),
+            // 🔔 Notifikasi
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.notifications_outlined,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
-          ),
+          ],
+        ),
         ],
       ),
     );
   }
 
   Widget _buildSearchBar() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -189,21 +217,24 @@ class _HomeTabState extends State<HomeTab> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: colorScheme.shadow.withOpacity(0.1),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
                 child: Row(
-                  children: const [
-                    Icon(Icons.search, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Text('Search now...', style: TextStyle(color: Colors.grey)),
+                  children: [
+                    Icon(Icons.search, color: colorScheme.onSurface.withOpacity(0.6)),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Search now...', 
+                      style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6))
+                    ),
                   ],
                 ),
               ),
@@ -233,12 +264,15 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   Widget _buildCategoryTabs() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     final colors = [
-      const Color(0xFFE3ECF9), // blue
-      const Color(0xFFDDF8F6), // cyan
-      const Color(0xFFFFEBF0), // pink
-      const Color(0xFFEDEBFF), // purple
-      const Color(0xFFFFF4E5), // yellow
+      colorScheme.primaryContainer.withOpacity(0.3),
+      colorScheme.secondaryContainer.withOpacity(0.3),
+      colorScheme.tertiaryContainer.withOpacity(0.3),
+      colorScheme.errorContainer.withOpacity(0.3),
+      colorScheme.surfaceContainerHighest.withOpacity(0.3),
     ];
 
     if (_isLoadingCategories) {
@@ -278,9 +312,9 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                   child: Text(
                     category['name'],
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -293,6 +327,9 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   Widget _buildRecommendedCoursesSection() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
       child: Column(
@@ -301,12 +338,12 @@ class _HomeTabState extends State<HomeTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Recommended Courses',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                 ),
               ),
               TextButton(
@@ -318,10 +355,10 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   );
                 },
-                child: const Text(
+                child: Text(
                   'See All',
                   style: TextStyle(
-                    color: Color(0xFF4C5FD5),
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -336,6 +373,9 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   Widget _buildPopularCoursesSection() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
       child: Column(
@@ -344,12 +384,12 @@ class _HomeTabState extends State<HomeTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Popular Courses',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                 ),
               ),
               TextButton(
@@ -361,10 +401,10 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   );
                 },
-                child: const Text(
+                child: Text(
                   'See All',
                   style: TextStyle(
-                    color: Color(0xFF4C5FD5),
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -382,13 +422,16 @@ class _HomeTabState extends State<HomeTab> {
     Future<Map<String, List<dynamic>>> coursesFuture,
     String key,
   ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return FutureBuilder<Map<String, List<dynamic>>>(
       future: coursesFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Center(child: CircularProgressIndicator()),
+          return Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(child: CircularProgressIndicator(color: colorScheme.primary)),
           );
         }
 
@@ -398,7 +441,7 @@ class _HomeTabState extends State<HomeTab> {
             child: Center(
               child: Text(
                 'Terjadi kesalahan: ${snapshot.error}',
-                style: const TextStyle(color: Colors.red),
+                style: TextStyle(color: colorScheme.error),
               ),
             ),
           );
@@ -406,9 +449,14 @@ class _HomeTabState extends State<HomeTab> {
 
         final courses = snapshot.data?[key];
         if (courses == null || courses.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Center(child: Text('Belum ada kursus tersedia.')),
+          return Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(
+              child: Text(
+                'Belum ada kursus tersedia.',
+                style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
+              ),
+            ),
           );
         }
 

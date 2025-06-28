@@ -120,10 +120,10 @@ class _YoutubeVideoPlayerPageState extends State<YoutubeVideoPlayerPage> {
       player: YoutubePlayer(
         controller: _controller,
         showVideoProgressIndicator: true,
-        progressIndicatorColor: Theme.of(context).primaryColor,
+        progressIndicatorColor: Theme.of(context).colorScheme.primary,
         progressColors: ProgressBarColors(
-          playedColor: Theme.of(context).primaryColor,
-          handleColor: Theme.of(context).primaryColor,
+          playedColor: Theme.of(context).colorScheme.primary,
+          handleColor: Theme.of(context).colorScheme.primary,
         ),
         onReady: () {
           if (!_isFullScreen) {

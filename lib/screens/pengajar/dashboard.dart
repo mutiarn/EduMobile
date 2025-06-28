@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_edu/screens/course_form_page.dart';
 import 'package:mobile_edu/screens/topic_list_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mobile_edu/components/theme_toggle_button.dart';
 
 class ManageCourseTab extends StatefulWidget {
   const ManageCourseTab({super.key});
@@ -100,8 +101,12 @@ class _ManageCourseTabState extends State<ManageCourseTab>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: colorScheme.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -113,18 +118,23 @@ class _ManageCourseTabState extends State<ManageCourseTab>
             backgroundColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF7475d6),
-                      const Color.fromARGB(255, 161, 161, 212),
-                    ],
+                    colors:[
+                            const Color(0xFF7475d6),
+                            const Color.fromARGB(255, 161, 161, 212),
+                          ]
                   ),
                 ),
                 child: Stack(
                   children: [
+                    Positioned(
+                      top: 40,
+                      right: 20,
+                      child: ThemeToggleButton(),
+                    ),
                     const Positioned(
                       bottom: 30,
                       left: 24,
@@ -191,7 +201,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7475d6),
+                        backgroundColor: colorScheme.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -221,14 +231,16 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                           _searchQuery = value;
                         });
                       },
+                      style: TextStyle(color: colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: 'Search your courses...',
-                        prefixIcon: const Icon(
+                        hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                        prefixIcon: Icon(
                           Icons.search,
-                          color: Colors.grey,
+                          color: theme.textTheme.bodyMedium?.color,
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: colorScheme.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 15,
@@ -239,8 +251,8 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF1f2967),
+                          borderSide: BorderSide(
+                            color: colorScheme.primary,
                             width: 1,
                           ),
                         ),
@@ -253,17 +265,17 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Your Courses',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: colorScheme.onBackground,
                         ),
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -283,10 +295,9 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                               },
                               icon: Icon(
                                 Icons.view_list,
-                                color:
-                                    !_isGridView
-                                        ? const Color(0xFF1f2967)
-                                        : Colors.grey,
+                                color: !_isGridView
+                                    ? colorScheme.primary
+                                    : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                             IconButton(
@@ -297,10 +308,9 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                               },
                               icon: Icon(
                                 Icons.grid_view,
-                                color:
-                                    _isGridView
-                                        ? const Color(0xFF1f2967)
-                                        : Colors.grey,
+                                color: _isGridView
+                                    ? colorScheme.primary
+                                    : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ],
@@ -317,9 +327,11 @@ class _ManageCourseTabState extends State<ManageCourseTab>
               future: _coursesFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SizedBox(
+                  return SizedBox(
                     height: 300,
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(
+                      child: CircularProgressIndicator(color: colorScheme.primary),
+                    ),
                   );
                 }
                 if (snapshot.hasError) {
@@ -327,7 +339,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                     height: 300,
                     margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red[50],
+                      color: isDark ? Colors.red.withOpacity(0.1) : Colors.red[50],
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Center(
@@ -379,14 +391,14 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                           Icon(
                             Icons.search_off,
                             size: 60,
-                            color: Colors.grey[400],
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'No courses found',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.grey[600],
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -411,11 +423,15 @@ class _ManageCourseTabState extends State<ManageCourseTab>
   }
 
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 400,
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -433,8 +449,10 @@ class _ManageCourseTabState extends State<ManageCourseTab>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                      : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
                 ),
                 borderRadius: BorderRadius.circular(60),
               ),
@@ -445,18 +463,18 @@ class _ManageCourseTabState extends State<ManageCourseTab>
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'No Courses Yet',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'You haven\'t created any courses yet.\nStart by creating your first course!',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 16, color: theme.textTheme.bodyMedium?.color),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -471,8 +489,8 @@ class _ManageCourseTabState extends State<ManageCourseTab>
               icon: const Icon(Icons.add),
               label: const Text('Create Course'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1f2967),
-                foregroundColor: Colors.white,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
@@ -501,9 +519,13 @@ class _ManageCourseTabState extends State<ManageCourseTab>
           future: _getEnrollmentCount(course),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(
+              return SizedBox(
                 height: 150,
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
               );
             }
 
@@ -546,7 +568,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -556,14 +578,18 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                       ),
                     ],
                   ),
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
                 );
               }
 
               if (snapshot.hasError) {
                 return Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Center(
@@ -594,9 +620,12 @@ class _ManageCourseTabState extends State<ManageCourseTab>
     int enrollmentCount,
     bool isGrid,
   ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -614,6 +643,10 @@ class _ManageCourseTabState extends State<ManageCourseTab>
   }
 
   Widget _buildListCard(Map<String, dynamic> course, int enrollmentCount) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -633,7 +666,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                             height: 80,
                             width: 80,
                             decoration: BoxDecoration(
-                              color: Colors.grey[200],
+                              color: isDark ? Colors.grey[800] : Colors.grey[200],
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: const Center(
@@ -645,12 +678,12 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                             height: 80,
                             width: 80,
                             decoration: BoxDecoration(
-                              color: Colors.grey[200],
+                              color: isDark ? Colors.grey[800] : Colors.grey[200],
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Icon(
                               Icons.broken_image,
-                              color: Colors.grey[400],
+                              color: isDark ? Colors.grey[600] : Colors.grey[400],
                             ),
                           ),
                     )
@@ -658,8 +691,10 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                       height: 80,
                       width: 80,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                              : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
                         ),
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -679,10 +714,10 @@ class _ManageCourseTabState extends State<ManageCourseTab>
               children: [
                 Text(
                   course['title'] ?? 'No Title',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -690,7 +725,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                 const SizedBox(height: 4),
                 Text(
                   course['description'] ?? 'No description available.',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 14, color: theme.textTheme.bodyMedium?.color),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -803,12 +838,12 @@ class _ManageCourseTabState extends State<ManageCourseTab>
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF1f2967).withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.more_vert,
-                color: Color(0xFF1f2967),
+                color: colorScheme.primary,
                 size: 20,
               ),
             ),
@@ -819,6 +854,10 @@ class _ManageCourseTabState extends State<ManageCourseTab>
   }
 
   Widget _buildGridCard(Map<String, dynamic> course, int enrollmentCount) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -845,7 +884,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                             height: double.infinity,
                             placeholder:
                                 (context, url) => Container(
-                                  color: Colors.grey[200],
+                                  color: isDark ? Colors.grey[800] : Colors.grey[200],
                                   child: const Center(
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
@@ -854,18 +893,20 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                                 ),
                             errorWidget:
                                 (context, url, error) => Container(
-                                  color: Colors.grey[200],
+                                  color: isDark ? Colors.grey[800] : Colors.grey[200],
                                   child: Icon(
                                     Icons.broken_image,
-                                    color: Colors.grey[400],
+                                    color: isDark ? Colors.grey[600] : Colors.grey[400],
                                     size: 40,
                                   ),
                                 ),
                           )
                           : Container(
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [Color(0xFF1f2967), Color(0xFF4a5394)],
+                                colors: isDark
+                                    ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                                    : [const Color(0xFF1f2967), const Color(0xFF4a5394)],
                               ),
                             ),
                             child: const Center(
@@ -892,10 +933,10 @@ class _ManageCourseTabState extends State<ManageCourseTab>
               children: [
                 Text(
                   course['title'] ?? 'No Title',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -985,16 +1026,16 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1f2967).withOpacity(0.1),
+                      color: colorScheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Manage',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1f2967),
+                        color: colorScheme.primary,
                       ),
                     ),
                   ),
@@ -1008,15 +1049,18 @@ class _ManageCourseTabState extends State<ManageCourseTab>
   }
 
   void _showDeleteBottomSheet(Map<String, dynamic> course) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder:
           (context) => Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
               ),
@@ -1030,7 +1074,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: theme.textTheme.bodyMedium?.color,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1053,9 +1097,13 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                 const SizedBox(height: 16),
 
                 // Title
-                const Text(
+                Text(
                   'Delete Course?',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 12),
 
@@ -1065,7 +1113,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
+                    color: theme.textTheme.bodyMedium?.color,
                     height: 1.5,
                   ),
                 ),
@@ -1081,7 +1129,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: Colors.grey[300]!),
+                            side: BorderSide(color: theme.textTheme.bodyMedium?.color ?? Colors.grey),
                           ),
                         ),
                         child: const Text(

@@ -38,19 +38,33 @@ class _HomeAdminState extends State<HomeAdmin> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
           border: Border(
-            top: BorderSide(color: Colors.grey.shade300, width: 1),
+            top: BorderSide(
+              color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+              width: 1,
+            ),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -63,17 +77,17 @@ class _HomeAdminState extends State<HomeAdmin> {
                 curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color:
-                      isActive
-                          ? const Color(0xFF1f2967).withOpacity(0.12)
-                          : Colors.transparent,
+                  color: isActive
+                      ? colorScheme.primary.withOpacity(0.12)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   _iconList[i],
                   size: 24,
-                  color:
-                      isActive ? const Color(0xFF1f2967) : Colors.grey.shade500,
+                  color: isActive
+                      ? colorScheme.primary
+                      : theme.textTheme.bodyMedium?.color,
                 ),
               ),
             );
@@ -91,19 +105,21 @@ class AdminProfileTab extends StatefulWidget {
 }
 
 class _AdminProfileTabState extends State<AdminProfileTab> {
-  static const mainColor = Color(0xFF7475d6);
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Admin Profile',
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w600,
-              color: mainColor,
+              color: colorScheme.onBackground,
             ),
           ),
           const SizedBox(height: 20),
@@ -120,8 +136,8 @@ class _AdminProfileTabState extends State<AdminProfileTab> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: mainColor,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -152,7 +168,6 @@ class _CourseFormPageState extends State<CourseFormPage> {
   String? selectedTeacherId;
   List<Map<String, dynamic>> categories = [];
   List<Map<String, dynamic>> teachers = [];
-  static const mainColor = Color(0xFF1f2967);
 
   @override
   void initState() {
@@ -203,18 +218,21 @@ class _CourseFormPageState extends State<CourseFormPage> {
   }
 
   InputDecoration inputDecoration(String label) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: mainColor),
+      labelStyle: TextStyle(color: colorScheme.primary),
       filled: true,
-      fillColor: Colors.grey.shade100,
+      fillColor: colorScheme.surface,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: mainColor, width: 2),
+        borderSide: BorderSide(color: colorScheme.primary, width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
     );
@@ -222,12 +240,16 @@ class _CourseFormPageState extends State<CourseFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isEdit = widget.course != null;
+
     return Scaffold(
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         title: Text(isEdit ? 'Edit Course' : 'Add Course'),
-        backgroundColor: mainColor,
-        foregroundColor: Colors.white,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         elevation: 6,
       ),
       body: Padding(
@@ -237,54 +259,60 @@ class _CourseFormPageState extends State<CourseFormPage> {
             TextField(
               controller: titleCtrl,
               decoration: inputDecoration('Title'),
+              style: TextStyle(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: priceCtrl,
               keyboardType: TextInputType.number,
               decoration: inputDecoration('Price'),
+              style: TextStyle(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: descCtrl,
               maxLines: 4,
               decoration: inputDecoration('Description'),
+              style: TextStyle(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: selectedTeacherId,
-              items:
-                  teachers
-                      .map(
-                        (user) => DropdownMenuItem<String>(
-                          value: user['id'].toString(),
-                          child: Text(user['email'] ?? 'No Email'),
-                        ),
-                      )
-                      .toList(),
+              items: teachers
+                  .map(
+                    (user) => DropdownMenuItem<String>(
+                      value: user['id'].toString(),
+                      child: Text(user['email'] ?? 'No Email'),
+                    ),
+                  )
+                  .toList(),
               onChanged: (val) => setState(() => selectedTeacherId = val),
               decoration: inputDecoration('Teacher'),
+              dropdownColor: colorScheme.surface,
+              style: TextStyle(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: selectedCategoryId,
-              items:
-                  categories
-                      .map(
-                        (cat) => DropdownMenuItem(
-                          value: cat['id'] as String,
-                          child: Text(cat['name']),
-                        ),
-                      )
-                      .toList(),
+              items: categories
+                  .map(
+                    (cat) => DropdownMenuItem(
+                      value: cat['id'] as String,
+                      child: Text(cat['name']),
+                    ),
+                  )
+                  .toList(),
               onChanged: (val) => setState(() => selectedCategoryId = val),
               decoration: inputDecoration('Category'),
+              dropdownColor: colorScheme.surface,
+              style: TextStyle(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: thumbnailCtrl,
               decoration: inputDecoration('Thumbnail URL'),
               onChanged: (_) => setState(() {}),
+              style: TextStyle(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 20),
             if (thumbnailCtrl.text.isNotEmpty)
@@ -294,23 +322,22 @@ class _CourseFormPageState extends State<CourseFormPage> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 clipBehavior: Clip.antiAlias,
-                shadowColor: mainColor.withOpacity(0.3),
+                shadowColor: colorScheme.primary.withOpacity(0.3),
                 child: Image.network(
                   thumbnailCtrl.text,
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder:
-                      (_, __, ___) => SizedBox(
-                        height: 180,
-                        child: Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            color: Colors.grey.shade400,
-                            size: 50,
-                          ),
-                        ),
+                  errorBuilder: (_, __, ___) => SizedBox(
+                    height: 180,
+                    child: Center(
+                      child: Icon(
+                        Icons.broken_image,
+                        color: Colors.grey.shade400,
+                        size: 50,
                       ),
+                    ),
+                  ),
                 ),
               ),
             const SizedBox(height: 28),
@@ -324,7 +351,8 @@ class _CourseFormPageState extends State<CourseFormPage> {
                   style: const TextStyle(fontSize: 18),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: mainColor,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),

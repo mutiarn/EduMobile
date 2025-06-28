@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:mobile_edu/components/theme_toggle_button.dart';
 
 class CourseFormPage extends StatefulWidget {
   final Map<String, dynamic>? course;
@@ -93,18 +94,18 @@ class _CourseFormPageState extends State<CourseFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final primary = const Color(0xFF7475d6);
-    final secondary = const Color.fromARGB(255, 125, 126, 194);
-    final accent = const Color(0xFF00BCD4);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         title: Text(
           widget.course == null ? 'Create Course' : 'Edit Course',
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
-        backgroundColor: primary,
+        backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -112,6 +113,12 @@ class _CourseFormPageState extends State<CourseFormPage> {
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: ThemeToggleButton(),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -120,11 +127,14 @@ class _CourseFormPageState extends State<CourseFormPage> {
             Container(
               height: 120,
               width: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [primary, secondary],
+                  colors: [
+                    Color(0xFF7475d6),
+                    Color.fromARGB(255, 161, 161, 212),
+                  ],
                 ),
               ),
               child: Column(
@@ -163,7 +173,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
             Container(
               margin: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
@@ -250,7 +260,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Colors.grey.shade200,
+                              color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
                               width: 2,
                             ),
                           ),
@@ -265,7 +275,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
                                   (context, url) => Container(
                                     height: 200,
                                     decoration: BoxDecoration(
-                                      color: Colors.grey.shade100,
+                                      color: isDark ? Colors.grey[800] : Colors.grey[100],
                                       borderRadius: BorderRadius.circular(14),
                                     ),
                                     child: const Center(
@@ -276,7 +286,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
                                   (context, url, error) => Container(
                                     height: 200,
                                     decoration: BoxDecoration(
-                                      color: Colors.grey.shade100,
+                                      color: isDark ? Colors.grey[800] : Colors.grey[100],
                                       borderRadius: BorderRadius.circular(14),
                                     ),
                                     child: Column(
@@ -286,13 +296,13 @@ class _CourseFormPageState extends State<CourseFormPage> {
                                         Icon(
                                           Icons.broken_image,
                                           size: 60,
-                                          color: Colors.grey.shade400,
+                                          color: isDark ? Colors.grey[600] : Colors.grey[400],
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
                                           'Failed to load image',
                                           style: TextStyle(
-                                            color: Colors.grey.shade500,
+                                            color: theme.textTheme.bodyMedium?.color,
                                           ),
                                         ),
                                       ],
@@ -311,13 +321,13 @@ class _CourseFormPageState extends State<CourseFormPage> {
                         child: ElevatedButton(
                           onPressed: _loading ? null : _submitForm,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: primary,
+                            backgroundColor: colorScheme.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 0,
-                            shadowColor: primary.withOpacity(0.3),
+                            shadowColor: colorScheme.primary.withOpacity(0.3),
                           ),
                           child:
                               _loading
@@ -363,16 +373,17 @@ class _CourseFormPageState extends State<CourseFormPage> {
   }
 
   Widget _buildSectionTitle(String title, IconData icon) {
+    final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, size: 20, color: Colors.grey.shade600),
+        Icon(icon, size: 20, color: theme.textTheme.bodyMedium?.color),
         const SizedBox(width: 8),
         Text(
           title,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade800,
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ],
@@ -382,41 +393,47 @@ class _CourseFormPageState extends State<CourseFormPage> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    IconData? icon, // ubah dari required ke optional
+    IconData? icon,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
     int maxLines = 1,
     void Function(String)? onChanged,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       maxLines: maxLines,
       onChanged: onChanged,
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
         prefixIcon:
             icon != null
-                ? Icon(icon, color: Colors.grey.shade600)
-                : null, // tampilkan hanya jika icon != null
+                ? Icon(icon, color: theme.textTheme.bodyMedium?.color)
+                : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF1f2967), width: 2),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: colorScheme.surface,
         contentPadding: const EdgeInsets.all(16),
       ),
       validator: validator,
@@ -424,39 +441,52 @@ class _CourseFormPageState extends State<CourseFormPage> {
   }
 
   Widget _buildDropdown() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return DropdownButtonFormField<String>(
       value: _selectedCategory,
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Select category',
-        prefixIcon: Icon(Icons.category, color: Colors.grey.shade600),
+        labelStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+        prefixIcon: Icon(Icons.category, color: theme.textTheme.bodyMedium?.color),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF1f2967), width: 2),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: colorScheme.surface,
         contentPadding: const EdgeInsets.all(16),
       ),
+      dropdownColor: colorScheme.surface,
       items:
           _categories
               .map(
                 (c) => DropdownMenuItem<String>(
                   value: c['id'],
-                  child: Text(c['name']),
+                  child: Text(
+                    c['name'],
+                    style: TextStyle(color: colorScheme.onSurface),
+                  ),
                 ),
               )
               .toList(),
       onChanged: (v) => setState(() => _selectedCategory = v),
       validator: (v) => v == null ? 'Category is required' : null,
-      icon: const Icon(Icons.keyboard_arrow_down),
+      icon: Icon(
+        Icons.keyboard_arrow_down,
+        color: theme.textTheme.bodyMedium?.color,
+      ),
     );
   }
 }

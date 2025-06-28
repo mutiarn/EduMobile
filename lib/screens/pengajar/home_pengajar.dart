@@ -53,6 +53,9 @@ class _HomePengajarState extends State<HomePengajar>
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       body: PageView(
@@ -63,14 +66,24 @@ class _HomePengajarState extends State<HomePengajar>
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
           border: Border(
-            top: BorderSide(color: Colors.grey.shade300, width: 1),
+            top: BorderSide(
+              color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+              width: 1,
+            ),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -83,17 +96,17 @@ class _HomePengajarState extends State<HomePengajar>
                 curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color:
-                      isActive
-                          ? const Color(0xFF1f2967).withOpacity(0.12)
-                          : Colors.transparent,
+                  color: isActive
+                      ? colorScheme.primary.withOpacity(0.12)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   _iconList[i],
                   size: 24,
-                  color:
-                      isActive ? const Color(0xFF1f2967) : Colors.grey.shade500,
+                  color: isActive
+                      ? colorScheme.primary
+                      : theme.textTheme.bodyMedium?.color,
                 ),
               ),
             );

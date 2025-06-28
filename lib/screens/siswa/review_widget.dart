@@ -106,24 +106,28 @@ class _ReviewFormState extends State<ReviewForm> {
         top: 20,
         bottom: MediaQuery.of(context).viewInsets.bottom + 20,
       ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Tulis Review',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 20),
           
-          const Text('Rating'),
+          Text(
+            'Rating',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          ),
           const SizedBox(height: 8),
           Center(
             child: RatingBar.builder(
@@ -164,14 +168,27 @@ class _ReviewFormState extends State<ReviewForm> {
           ),
           
           const SizedBox(height: 20),
-          const Text('Komentar'),
+          Text(
+            'Komentar',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: _commentController,
             maxLines: 4,
-            decoration: const InputDecoration(
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            decoration: InputDecoration(
               hintText: 'Tulis pengalaman Anda...',
-              border: OutlineInputBorder(),
+              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+              ),
             ),
           ),
           
@@ -181,14 +198,19 @@ class _ReviewFormState extends State<ReviewForm> {
             child: ElevatedButton(
               onPressed: _isSubmitting ? null : _submitReview,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1f2967),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: _isSubmitting
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text(
+                  ? CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    )
+                  : Text(
                       'Kirim Review',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
             ),
           ),

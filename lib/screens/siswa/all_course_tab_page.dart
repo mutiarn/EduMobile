@@ -83,6 +83,9 @@ class _AllCourseTabState extends State<AllCourseTab>
   }
 
   void _showFilterBottomSheet() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -93,9 +96,9 @@ class _AllCourseTabState extends State<AllCourseTab>
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               ),
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -107,20 +110,23 @@ class _AllCourseTabState extends State<AllCourseTab>
                     children: [
                       Text(
                         'Filter & Sort',
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
+                        ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
+                        icon: Icon(Icons.close, color: colorScheme.onSurface),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
                   Text(
                     'Urutkan berdasarkan',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -169,7 +175,8 @@ class _AllCourseTabState extends State<AllCourseTab>
                         _fetchCourses();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1f2967),
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -178,7 +185,6 @@ class _AllCourseTabState extends State<AllCourseTab>
                       child: const Text(
                         'Terapkan Filter',
                         style: TextStyle(
-                          color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -201,24 +207,37 @@ class _AllCourseTabState extends State<AllCourseTab>
     String selectedValue,
     Function(String) onSelected,
   ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isSelected = selectedValue == value;
 
-    return FilterChip(
-      label: Text(text),
-      selected: isSelected,
-      onSelected: (_) => onSelected(value),
-      selectedColor: const Color(0xFF1f2967).withOpacity(0.2),
-      checkmarkColor: const Color(0xFF1f2967),
-      labelStyle: TextStyle(
-        color: isSelected ? const Color(0xFF1f2967) : Colors.grey[700],
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      child: FilterChip(
+        label: Text(text),
+        selected: isSelected,
+        showCheckmark: false, // Remove checkmark
+        onSelected: (_) => onSelected(value),
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        selectedColor: colorScheme.primary,
+        checkmarkColor: colorScheme.onPrimary,
+        labelStyle: TextStyle(
+          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface.withOpacity(0.7),
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: isSelected ? 2 : 0,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
@@ -226,13 +245,13 @@ class _AllCourseTabState extends State<AllCourseTab>
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    const Color(0xFF7475d6),
-                    const Color.fromARGB(255, 161, 161, 212),
+                    Color(0xFF7475d6), // Preserve this color
+                    Color.fromARGB(255, 161, 161, 212),
                   ],
                 ),
               ),
@@ -241,7 +260,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'All Courses',
                       style: TextStyle(
                         color: Colors.white,
@@ -263,10 +282,10 @@ class _AllCourseTabState extends State<AllCourseTab>
             ),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surface,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: colorScheme.shadow.withOpacity(0.1),
                     spreadRadius: 1,
                     blurRadius: 10,
                     offset: const Offset(0, 2),
@@ -281,12 +300,10 @@ class _AllCourseTabState extends State<AllCourseTab>
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        gradient: LinearGradient(
-                          colors: [Colors.grey[100]!, Colors.grey[50]!],
-                        ),
+                        color: colorScheme.surfaceContainerHighest,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
+                            color: colorScheme.shadow.withOpacity(0.1),
                             spreadRadius: 1,
                             blurRadius: 8,
                             offset: const Offset(0, 2),
@@ -307,17 +324,17 @@ class _AllCourseTabState extends State<AllCourseTab>
                         },
                         decoration: InputDecoration(
                           hintText: 'Cari kursus impian Anda...',
-                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.5)),
                           prefixIcon: Icon(
                             Icons.search,
-                            color: Colors.grey[600],
+                            color: colorScheme.onSurface.withOpacity(0.6),
                           ),
                           suffixIcon:
                               _searchQuery.isNotEmpty
                                   ? IconButton(
                                     icon: Icon(
                                       Icons.clear,
-                                      color: Colors.grey[600],
+                                      color: colorScheme.onSurface.withOpacity(0.6),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -346,11 +363,12 @@ class _AllCourseTabState extends State<AllCourseTab>
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return const SizedBox(
+                                return SizedBox(
                                   height: 40,
                                   child: Center(
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
+                                      color: colorScheme.primary,
                                     ),
                                   ),
                                 );
@@ -389,14 +407,14 @@ class _AllCourseTabState extends State<AllCourseTab>
                             // Filter Button
                             Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1f2967).withOpacity(0.1),
+                                color: colorScheme.primaryContainer,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: IconButton(
                                 onPressed: _showFilterBottomSheet,
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.tune,
-                                  color: Color(0xFF1f2967),
+                                  color: colorScheme.primary,
                                 ),
                                 tooltip: 'Filter',
                               ),
@@ -405,7 +423,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                             // View Toggle Button
                             Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1f2967).withOpacity(0.1),
+                                color: colorScheme.primaryContainer,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: IconButton(
@@ -416,7 +434,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                                 },
                                 icon: Icon(
                                   _isGridView ? Icons.list : Icons.grid_view,
-                                  color: const Color(0xFF1f2967),
+                                  color: colorScheme.primary,
                                 ),
                                 tooltip:
                                     _isGridView
@@ -437,9 +455,9 @@ class _AllCourseTabState extends State<AllCourseTab>
                 future: _coursesFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
+                    return Center(
                       child: CircularProgressIndicator(
-                        color: Color(0xFF1f2967),
+                        color: colorScheme.primary,
                       ),
                     );
                   }
@@ -451,17 +469,19 @@ class _AllCourseTabState extends State<AllCourseTab>
                           Icon(
                             Icons.error_outline,
                             size: 64,
-                            color: Colors.red[300],
+                            color: colorScheme.error,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Terjadi kesalahan',
-                            style: Theme.of(context).textTheme.titleLarge,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: colorScheme.onSurface,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Error: ${snapshot.error}',
-                            style: TextStyle(color: Colors.grey[600]),
+                            style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -476,18 +496,19 @@ class _AllCourseTabState extends State<AllCourseTab>
                           Icon(
                             Icons.school_outlined,
                             size: 64,
-                            color: Colors.grey[400],
+                            color: colorScheme.onSurface.withOpacity(0.4),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Tidak ada kursus ditemukan',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(color: Colors.grey[600]),
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: colorScheme.onSurface.withOpacity(0.6),
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Coba ubah kata kunci pencarian atau filter',
-                            style: TextStyle(color: Colors.grey[500]),
+                            style: TextStyle(color: colorScheme.onSurface.withOpacity(0.5)),
                           ),
                         ],
                       ),
@@ -508,23 +529,27 @@ class _AllCourseTabState extends State<AllCourseTab>
   }
 
   Widget _buildCategoryChip(String text, String? categoryId) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isSelected = _selectedCategory == categoryId;
+    
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       child: FilterChip(
         label: Text(text),
         selected: isSelected,
+        showCheckmark: false, // Remove checkmark
         onSelected: (selected) {
           setState(() {
             _selectedCategory = selected ? categoryId : null;
             _fetchCourses();
           });
         },
-        backgroundColor: Colors.grey[100],
-        selectedColor: const Color(0xFF1f2967),
-        checkmarkColor: Colors.white,
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        selectedColor: colorScheme.primary,
+        checkmarkColor: colorScheme.onPrimary,
         labelStyle: TextStyle(
-          color: isSelected ? Colors.white : Colors.grey[700],
+          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface.withOpacity(0.7),
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -562,6 +587,9 @@ class _AllCourseTabState extends State<AllCourseTab>
   }
 
   Widget _buildCourseCard(Map<String, dynamic> course, int index) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return AnimatedContainer(
       duration: Duration(milliseconds: 300 + (index * 100)),
       child: GestureDetector(
@@ -574,11 +602,11 @@ class _AllCourseTabState extends State<AllCourseTab>
         child: Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: colorScheme.shadow.withOpacity(0.1),
                 spreadRadius: 2,
                 blurRadius: 15,
                 offset: const Offset(0, 5),
@@ -606,12 +634,13 @@ class _AllCourseTabState extends State<AllCourseTab>
                                     height: 100,
                                     width: 100,
                                     decoration: BoxDecoration(
-                                      color: Colors.grey[200],
+                                      color: colorScheme.surfaceContainerHighest,
                                       borderRadius: BorderRadius.circular(15),
                                     ),
-                                    child: const Center(
+                                    child: Center(
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
+                                        color: colorScheme.primary,
                                       ),
                                     ),
                                   ),
@@ -620,12 +649,12 @@ class _AllCourseTabState extends State<AllCourseTab>
                                     height: 100,
                                     width: 100,
                                     decoration: BoxDecoration(
-                                      color: Colors.grey[200],
+                                      color: colorScheme.surfaceContainerHighest,
                                       borderRadius: BorderRadius.circular(15),
                                     ),
                                     child: Icon(
                                       Icons.broken_image,
-                                      color: Colors.grey[400],
+                                      color: colorScheme.onSurface.withOpacity(0.4),
                                       size: 32,
                                     ),
                                   ),
@@ -636,15 +665,15 @@ class _AllCourseTabState extends State<AllCourseTab>
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    const Color(0xFF1f2967).withOpacity(0.7),
-                                    const Color(0xFF1f2967).withOpacity(0.5),
+                                    colorScheme.primary.withOpacity(0.7),
+                                    colorScheme.primary.withOpacity(0.5),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(15),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.school,
-                                color: Colors.white,
+                                color: colorScheme.onPrimary,
                                 size: 32,
                               ),
                             ),
@@ -657,11 +686,9 @@ class _AllCourseTabState extends State<AllCourseTab>
                     children: [
                       Text(
                         course['title'],
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleMedium?.copyWith(
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
+                          color: colorScheme.onSurface,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -669,8 +696,8 @@ class _AllCourseTabState extends State<AllCourseTab>
                       const SizedBox(height: 6),
                       Text(
                         course['description'] ?? 'Tidak ada deskripsi.',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface.withOpacity(0.6),
                           height: 1.4,
                         ),
                         maxLines: 2,
@@ -685,13 +712,13 @@ class _AllCourseTabState extends State<AllCourseTab>
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
+                              color: colorScheme.secondaryContainer,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               'Rp ${_formatPrice(course['price'])}',
                               style: TextStyle(
-                                color: Colors.green[700],
+                                color: colorScheme.onSecondaryContainer,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
@@ -708,13 +735,13 @@ class _AllCourseTabState extends State<AllCourseTab>
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1f2967).withOpacity(0.1),
+                            color: colorScheme.primaryContainer,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             course['category_course']['name'],
                             style: TextStyle(
-                              color: const Color(0xFF1f2967),
+                              color: colorScheme.primary,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -732,6 +759,9 @@ class _AllCourseTabState extends State<AllCourseTab>
   }
 
   Widget _buildGridCourseCard(Map<String, dynamic> course, int index) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return AnimatedContainer(
       duration: Duration(milliseconds: 300 + (index * 50)),
       child: GestureDetector(
@@ -743,11 +773,11 @@ class _AllCourseTabState extends State<AllCourseTab>
         },
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: colorScheme.shadow.withOpacity(0.1),
                 spreadRadius: 2,
                 blurRadius: 15,
                 offset: const Offset(0, 5),
@@ -773,19 +803,20 @@ class _AllCourseTabState extends State<AllCourseTab>
                               fit: BoxFit.cover,
                               placeholder:
                                   (context, url) => Container(
-                                    color: Colors.grey[200],
-                                    child: const Center(
+                                    color: colorScheme.surfaceContainerHighest,
+                                    child: Center(
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
+                                        color: colorScheme.primary,
                                       ),
                                     ),
                                   ),
                               errorWidget:
                                   (context, url, error) => Container(
-                                    color: Colors.grey[200],
+                                    color: colorScheme.surfaceContainerHighest,
                                     child: Icon(
                                       Icons.broken_image,
-                                      color: Colors.grey[400],
+                                      color: colorScheme.onSurface.withOpacity(0.4),
                                       size: 32,
                                     ),
                                   ),
@@ -795,14 +826,14 @@ class _AllCourseTabState extends State<AllCourseTab>
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    const Color(0xFF1f2967).withOpacity(0.7),
-                                    const Color(0xFF1f2967).withOpacity(0.5),
+                                    colorScheme.primary.withOpacity(0.7),
+                                    colorScheme.primary.withOpacity(0.5),
                                   ],
                                 ),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.school,
-                                color: Colors.white,
+                                color: colorScheme.onPrimary,
                                 size: 40,
                               ),
                             ),
@@ -818,9 +849,9 @@ class _AllCourseTabState extends State<AllCourseTab>
                     children: [
                       Text(
                         course['title'],
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
+                          color: colorScheme.onSurface,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -829,7 +860,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                       Text(
                         'Rp ${_formatPrice(course['price'])}',
                         style: TextStyle(
-                          color: Colors.green[700],
+                          color: colorScheme.onSecondaryContainer,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -843,13 +874,13 @@ class _AllCourseTabState extends State<AllCourseTab>
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1f2967).withOpacity(0.1),
+                            color: colorScheme.primaryContainer,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             course['category_course']['name'],
                             style: TextStyle(
-                              color: const Color(0xFF1f2967),
+                              color: colorScheme.primary,
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                             ),

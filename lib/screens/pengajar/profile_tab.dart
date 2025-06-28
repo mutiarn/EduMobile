@@ -47,17 +47,20 @@ class _ProfileTabState extends State<ProfileTab> {
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF7475d6),
-              const Color.fromARGB(255, 161, 161, 212),
-            ],
+            colors:[
+                    const Color(0xFF7475d6),
+                    const Color.fromARGB(255, 161, 161, 212),
+                  ]
           ),
         ),
         child: SafeArea(
@@ -134,9 +137,9 @@ class _ProfileTabState extends State<ProfileTab> {
               const SizedBox(height: 40),
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
                     ),
@@ -230,13 +233,17 @@ class _ProfileTabState extends State<ProfileTab> {
     required VoidCallback onTap,
     bool hasNotification = false,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: isDark ? colorScheme.background : Colors.grey.shade50,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -244,26 +251,26 @@ class _ProfileTabState extends State<ProfileTab> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.shade200,
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              child: Icon(icon, color: Colors.grey.shade700, size: 20),
+              child: Icon(icon, color: theme.textTheme.bodyMedium?.color, size: 20),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
@@ -279,7 +286,7 @@ class _ProfileTabState extends State<ProfileTab> {
             const SizedBox(width: 8),
             Icon(
               Icons.arrow_forward_ios,
-              color: Colors.grey.shade400,
+              color: theme.textTheme.bodyMedium?.color,
               size: 16,
             ),
           ],

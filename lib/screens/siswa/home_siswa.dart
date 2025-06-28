@@ -55,7 +55,11 @@ class _HomeSiswaState extends State<HomeSiswa> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: PageView(
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),
@@ -70,14 +74,21 @@ class _HomeSiswaState extends State<HomeSiswa> with TickerProviderStateMixin {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
           border: Border(
-            top: BorderSide(color: Colors.grey.shade300, width: 1),
+            top: BorderSide(color: colorScheme.outline.withOpacity(0.3), width: 1),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.shadow.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -92,7 +103,7 @@ class _HomeSiswaState extends State<HomeSiswa> with TickerProviderStateMixin {
                 decoration: BoxDecoration(
                   color:
                       isActive
-                          ? const Color(0xFF1f2967).withOpacity(0.12)
+                          ? colorScheme.primary.withOpacity(0.12)
                           : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -100,7 +111,7 @@ class _HomeSiswaState extends State<HomeSiswa> with TickerProviderStateMixin {
                   _iconList[i],
                   size: 24,
                   color:
-                      isActive ? const Color(0xFF1f2967) : Colors.grey.shade500,
+                      isActive ? colorScheme.primary : colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             );

@@ -233,12 +233,15 @@ class _CourseDetailPageState extends State<CourseDetailPage>
   }
 
   Widget _buildCourseHeader() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF7475d6), Color.fromARGB(255, 125, 126, 177)],
+          colors: [Color(0xFF7475d6), Color.fromARGB(255, 125, 126, 177)], // Preserve this color
         ),
       ),
       child: Column(
@@ -299,16 +302,20 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                       placeholder:
                           (context, url) => Container(
                             height: 200,
-                            color: Colors.grey[300],
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                            color: colorScheme.surfaceContainerHighest,
+                            child: Center(
+                              child: CircularProgressIndicator(color: colorScheme.primary),
                             ),
                           ),
                       errorWidget:
                           (context, url, error) => Container(
                             height: 200,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.broken_image, size: 60),
+                            color: colorScheme.surfaceContainerHighest,
+                            child: Icon(
+                              Icons.broken_image, 
+                              size: 60,
+                              color: colorScheme.onSurface.withOpacity(0.4),
+                            ),
                           ),
                     ),
                 ],
@@ -338,7 +345,7 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                     const SizedBox(width: 4),
                     Text(
                       averageRating.toStringAsFixed(1),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
@@ -361,11 +368,14 @@ class _CourseDetailPageState extends State<CourseDetailPage>
   }
 
   Widget _buildEnrollmentSection() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         ),
@@ -380,15 +390,18 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                   children: [
                     Text(
                       'Rp ${_formatPrice(widget.course['price'] ?? '0')}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF7475d6),
+                        color: colorScheme.primary,
                       ),
                     ),
-                    const Text(
+                    Text(
                       'Full course access',
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withOpacity(0.6), 
+                        fontSize: 14
+                      ),
                     ),
                   ],
                 ),
@@ -400,8 +413,8 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                   onPressed: _toggleEnrollment,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        _isEnrolled ? Colors.green : const Color(0xFF1f2967),
-                    foregroundColor: Colors.white,
+                        _isEnrolled ? colorScheme.secondary : colorScheme.primary,
+                    foregroundColor: _isEnrolled ? colorScheme.onSecondary : colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
@@ -443,19 +456,28 @@ class _CourseDetailPageState extends State<CourseDetailPage>
   }
 
   Widget _buildLessonsTab() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     if (_isLoadingTopics) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: CircularProgressIndicator(color: colorScheme.primary));
     }
 
     if (_errorMessage != null) {
       return Center(
-        child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+        child: Text(
+          _errorMessage!, 
+          style: TextStyle(color: colorScheme.error)
+        ),
       );
     }
 
     if (_topics.isEmpty) {
-      return const Center(
-        child: Text('No topics available for this course yet.'),
+      return Center(
+        child: Text(
+          'No topics available for this course yet.',
+          style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
+        ),
       );
     }
 
@@ -474,11 +496,11 @@ class _CourseDetailPageState extends State<CourseDetailPage>
         return Container(
           margin: const EdgeInsets.only(bottom: 12, top: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: colorScheme.shadow.withOpacity(0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -504,10 +526,11 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                                 (context, url) => Container(
                                   width: 80,
                                   height: 60,
-                                  color: Colors.grey[200],
-                                  child: const Center(
+                                  color: colorScheme.surfaceContainerHighest,
+                                  child: Center(
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
+                                      color: colorScheme.primary,
                                     ),
                                   ),
                                 ),
@@ -515,15 +538,21 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                                 (context, url, error) => Container(
                                   width: 80,
                                   height: 60,
-                                  color: Colors.grey[200],
-                                  child: const Icon(Icons.videocam_off),
+                                  color: colorScheme.surfaceContainerHighest,
+                                  child: Icon(
+                                    Icons.videocam_off,
+                                    color: colorScheme.onSurface.withOpacity(0.4),
+                                  ),
                                 ),
                           )
                           : Container(
                             width: 80,
                             height: 60,
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.video_library_outlined),
+                            color: colorScheme.surfaceContainerHighest,
+                            child: Icon(
+                              Icons.video_library_outlined,
+                              color: colorScheme.onSurface.withOpacity(0.4),
+                            ),
                           ),
                 ),
                 if (isLocked)
@@ -554,7 +583,7 @@ class _CourseDetailPageState extends State<CourseDetailPage>
               '${topic['order_no']}. ${topic['title']}',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: isLocked ? Colors.grey : Colors.black,
+                color: isLocked ? colorScheme.onSurface.withOpacity(0.5) : colorScheme.onSurface,
               ),
             ),
             subtitle: Column(
@@ -565,7 +594,7 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: isLocked ? Colors.grey : Colors.grey[600],
+                    color: isLocked ? colorScheme.onSurface.withOpacity(0.4) : colorScheme.onSurface.withOpacity(0.6),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -574,14 +603,14 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                     Icon(
                       Icons.access_time,
                       size: 14,
-                      color: isLocked ? Colors.grey : Colors.grey[500],
+                      color: isLocked ? colorScheme.onSurface.withOpacity(0.4) : colorScheme.onSurface.withOpacity(0.5),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${5 + index * 2} min',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isLocked ? Colors.grey : Colors.grey[500],
+                        color: isLocked ? colorScheme.onSurface.withOpacity(0.4) : colorScheme.onSurface.withOpacity(0.5),
                       ),
                     ),
                     if (index < 2 && !_isEnrolled) ...[
@@ -592,7 +621,7 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.green[100],
+                          color: colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -600,7 +629,7 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: Colors.green[700],
+                            color: colorScheme.onSecondaryContainer,
                           ),
                         ),
                       ),
@@ -611,8 +640,8 @@ class _CourseDetailPageState extends State<CourseDetailPage>
             ),
             trailing:
                 isLocked
-                    ? const Icon(Icons.lock, color: Colors.grey)
-                    : const Icon(Icons.chevron_right, color: Colors.grey),
+                    ? Icon(Icons.lock, color: colorScheme.onSurface.withOpacity(0.5))
+                    : Icon(Icons.chevron_right, color: colorScheme.onSurface.withOpacity(0.5)),
             onTap: () {
               if (canPlay && youtubeVideoId != null) {
                 Navigator.push(
@@ -642,6 +671,9 @@ class _CourseDetailPageState extends State<CourseDetailPage>
   }
 
   Widget _buildDescriptionTab() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Column(
@@ -649,18 +681,22 @@ class _CourseDetailPageState extends State<CourseDetailPage>
         children: [
           Text(
             widget.course['description'] ?? 'No description available.',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               height: 1.6,
-              color: Colors.black87,
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 30),
 
           // Instructor Info
-          const Text(
+          Text(
             'Instructor',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20, 
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -669,22 +705,23 @@ class _CourseDetailPageState extends State<CourseDetailPage>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Center(child: CircularProgressIndicator()),
+              child: Center(child: CircularProgressIndicator(color: colorScheme.primary)),
             )
           else
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 30,
+                    backgroundColor: colorScheme.primary,
                     backgroundImage:
                         (_instructor['avatar'] != null &&
                                 _instructor['avatar'].toString().isNotEmpty)
@@ -697,10 +734,10 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                               (_instructor['name']?.isNotEmpty ?? false)
                                   ? _instructor['name'][0].toUpperCase()
                                   : 'U',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: colorScheme.onPrimary,
                               ),
                             )
                             : null,
@@ -713,16 +750,17 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                         Text(
                           _instructor['name'] ??
                               'Instructor', // Add null check here
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         Text(
                           _instructor['title'] ??
                               'Senior Lecturer', // Add null check here
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: colorScheme.onSurface.withOpacity(0.6),
                             fontSize: 14,
                           ),
                         ),
@@ -737,15 +775,16 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                             const SizedBox(width: 4),
                             Text(
                               '${_instructor['rating'] ?? 4.7}', // Add null check here
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w600,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(width: 16),
                             Text(
                               '${_instructor['students'] ?? 1200} students', // Add null check here
                               style: TextStyle(
-                                color: Colors.grey[600],
+                                color: colorScheme.onSurface.withOpacity(0.6),
                                 fontSize: 12,
                               ),
                             ),
@@ -763,6 +802,9 @@ class _CourseDetailPageState extends State<CourseDetailPage>
   }
 
   void _showEnrollDialog() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -770,9 +812,9 @@ class _CourseDetailPageState extends State<CourseDetailPage>
       builder: (BuildContext context) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.85,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(28),
               topRight: Radius.circular(28),
             ),
@@ -785,7 +827,7 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: colorScheme.onSurface.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -803,10 +845,13 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                         width: double.infinity,
                         padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                            colors: [
+                              colorScheme.primary,
+                              colorScheme.secondary,
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -850,12 +895,12 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                       const SizedBox(height: 32),
 
                       // What you'll get section
-                      const Text(
+                      Text(
                         'What you\'ll get:',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1f2967),
+                          color: colorScheme.primary,
                         ),
                       ),
 
@@ -866,35 +911,35 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                         Icons.play_circle_fill,
                         'Complete Video Library',
                         'Access all ${widget.course['total_videos'] ?? '50+'} premium videos',
-                        const Color(0xFF4CAF50),
+                        colorScheme.secondary,
                       ),
 
                       _buildPremiumFeature(
                         Icons.download_for_offline,
                         'Offline Access',
                         'Download videos and watch without internet',
-                        const Color(0xFF2196F3),
+                        colorScheme.tertiary,
                       ),
 
                       _buildPremiumFeature(
                         Icons.quiz,
                         'Interactive Quizzes',
                         'Test your knowledge with exclusive exercises',
-                        const Color(0xFFFF9800),
+                        colorScheme.error,
                       ),
 
                       _buildPremiumFeature(
                         Icons.military_tech,
                         'Certificate',
                         'Get verified certificate upon completion',
-                        const Color(0xFF9C27B0),
+                        colorScheme.primary,
                       ),
 
                       _buildPremiumFeature(
                         Icons.support_agent,
                         'Priority Support',
                         '24/7 direct access to instructors',
-                        const Color(0xFFE91E63),
+                        colorScheme.secondary,
                       ),
 
                       const SizedBox(height: 32),
@@ -906,13 +951,13 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              const Color(0xFF667eea).withOpacity(0.1),
-                              const Color(0xFF764ba2).withOpacity(0.1),
+                              colorScheme.primaryContainer.withOpacity(0.3),
+                              colorScheme.secondaryContainer.withOpacity(0.3),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: const Color(0xFF667eea).withOpacity(0.3),
+                            color: colorScheme.primary.withOpacity(0.3),
                             width: 1.5,
                           ),
                         ),
@@ -927,13 +972,13 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFF6B6B),
+                                    color: colorScheme.error,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     '🔥 LIMITED TIME',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: colorScheme.onError,
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -948,30 +993,30 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                               children: [
                                 Text(
                                   'Rp ${_formatPrice((widget.course['price'] * 1.5).toInt())}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey,
+                                    color: colorScheme.onSurface.withOpacity(0.5),
                                     decoration: TextDecoration.lineThrough,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Rp ${_formatPrice(widget.course['price'])}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1f2967),
+                                    color: colorScheme.primary,
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               'One-time payment • Lifetime access • 30-day money back',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey,
+                                color: colorScheme.onSurface.withOpacity(0.6),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -988,10 +1033,10 @@ class _CourseDetailPageState extends State<CourseDetailPage>
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colorScheme.surface,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: colorScheme.shadow.withOpacity(0.1),
                       blurRadius: 10,
                       offset: const Offset(0, -5),
                     ),
@@ -1010,8 +1055,8 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                           _toggleEnrollment();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF667eea),
-                          foregroundColor: Colors.white,
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -1036,9 +1081,12 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text(
+                      child: Text(
                         'Maybe later',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                        style: TextStyle(
+                          color: colorScheme.onSurface.withOpacity(0.6), 
+                          fontSize: 16
+                        ),
                       ),
                     ),
                   ],
@@ -1057,13 +1105,16 @@ class _CourseDetailPageState extends State<CourseDetailPage>
     String description,
     Color iconColor,
   ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[200]!, width: 1),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.2), width: 1),
       ),
       child: Row(
         children: [
@@ -1082,21 +1133,24 @@ class _CourseDetailPageState extends State<CourseDetailPage>
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1f2967),
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 14, 
+                    color: colorScheme.onSurface.withOpacity(0.6)
+                  ),
                 ),
               ],
             ),
           ),
-          Icon(Icons.check_circle, color: Colors.green[400], size: 20),
+          Icon(Icons.check_circle, color: colorScheme.secondary, size: 20),
         ],
       ),
     );
@@ -1104,8 +1158,11 @@ class _CourseDetailPageState extends State<CourseDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: colorScheme.surfaceContainerHighest,
 
       body: NestedScrollView(
         headerSliverBuilder:
@@ -1118,11 +1175,11 @@ class _CourseDetailPageState extends State<CourseDetailPage>
                 delegate: _TabBarDelegate(
                   TabBar(
                     controller: _tabController,
-                    labelColor: Colors.white,
-                    unselectedLabelColor: Colors.grey[600],
+                    labelColor: colorScheme.onPrimary,
+                    unselectedLabelColor: colorScheme.onSurface.withOpacity(0.6),
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: BoxDecoration(
-                      color: const Color(0xFF1f2967),
+                      color: colorScheme.primary,
                       borderRadius: BorderRadius.circular(25),
                     ),
                     tabs: const [
@@ -1187,8 +1244,11 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Material(
-      color: Colors.white,
+      color: colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.only(top: _topOffset),
         child: _tabBar,

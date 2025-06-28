@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mobile_edu/components/theme_toggle_button.dart';
 
 class TopicFormPage extends StatefulWidget {
   final Map course;
@@ -123,17 +124,18 @@ class _TopicFormPageState extends State<TopicFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final primary = const Color(0xFF7475d6);
-    final secondary = const Color.fromARGB(255, 128, 129, 201);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         title: Text(
           widget.topic == null ? 'Add Topic' : 'Edit Topic',
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
-        backgroundColor: primary,
+        backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -141,6 +143,12 @@ class _TopicFormPageState extends State<TopicFormPage> {
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: ThemeToggleButton(),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -149,11 +157,14 @@ class _TopicFormPageState extends State<TopicFormPage> {
             Container(
               height: 120,
               width: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [primary, secondary],
+                  colors: [
+                    Color(0xFF7475d6),
+                    Color.fromARGB(255, 161, 161, 212),
+                  ],
                 ),
               ),
               child: Column(
@@ -192,7 +203,7 @@ class _TopicFormPageState extends State<TopicFormPage> {
             Container(
               margin: const EdgeInsets.fromLTRB(20, 20, 20, 10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -209,12 +220,12 @@ class _TopicFormPageState extends State<TopicFormPage> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: primary.withOpacity(0.1),
+                        color: colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         Icons.school_outlined,
-                        color: primary,
+                        color: colorScheme.primary,
                         size: 24,
                       ),
                     ),
@@ -227,17 +238,17 @@ class _TopicFormPageState extends State<TopicFormPage> {
                             'Course',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade600,
+                              color: theme.textTheme.bodyMedium?.color,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             widget.course['title'] ?? 'Unknown Course',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: colorScheme.onSurface,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -254,7 +265,7 @@ class _TopicFormPageState extends State<TopicFormPage> {
             Container(
               margin: const EdgeInsets.fromLTRB(20, 10, 20, 20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
@@ -333,7 +344,7 @@ class _TopicFormPageState extends State<TopicFormPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Colors.grey.shade200,
+                              color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
                               width: 2,
                             ),
                           ),
@@ -346,7 +357,7 @@ class _TopicFormPageState extends State<TopicFormPage> {
                                   height: 200,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
+                                    color: isDark ? Colors.grey[800] : Colors.grey[100],
                                     image: DecorationImage(
                                       image: NetworkImage(
                                         'https://img.youtube.com/vi/${_extractVideoId(videoUrlCtrl.text.trim())}/maxresdefault.jpg',
@@ -371,7 +382,7 @@ class _TopicFormPageState extends State<TopicFormPage> {
                                   padding: const EdgeInsets.all(12),
                                   child: Row(
                                     children: [
-                                      Icon(
+                                      const Icon(
                                         Icons.check_circle,
                                         color: Colors.green,
                                         size: 20,
@@ -398,9 +409,11 @@ class _TopicFormPageState extends State<TopicFormPage> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.orange.shade50,
+                            color: isDark ? Colors.orange.withOpacity(0.1) : Colors.orange.shade50,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.orange.shade200),
+                            border: Border.all(
+                              color: isDark ? Colors.orange.withOpacity(0.3) : Colors.orange.shade200,
+                            ),
                           ),
                           child: Row(
                             children: [
@@ -445,13 +458,13 @@ class _TopicFormPageState extends State<TopicFormPage> {
                         child: ElevatedButton(
                           onPressed: _loading ? null : save,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: primary,
+                            backgroundColor: colorScheme.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 0,
-                            shadowColor: primary.withOpacity(0.3),
+                            shadowColor: colorScheme.primary.withOpacity(0.3),
                           ),
                           child:
                               _loading
@@ -497,16 +510,17 @@ class _TopicFormPageState extends State<TopicFormPage> {
   }
 
   Widget _buildSectionTitle(String title, IconData icon) {
+    final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, size: 20, color: Colors.grey.shade600),
+        Icon(icon, size: 20, color: theme.textTheme.bodyMedium?.color),
         const SizedBox(width: 8),
         Text(
           title,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade800,
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ],
@@ -522,33 +536,39 @@ class _TopicFormPageState extends State<TopicFormPage> {
     int maxLines = 1,
     void Function(String)? onChanged,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       maxLines: maxLines,
       onChanged: onChanged,
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
         prefixIcon:
-            icon != null ? Icon(icon, color: Colors.grey.shade600) : null,
+            icon != null ? Icon(icon, color: theme.textTheme.bodyMedium?.color) : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF1f2967), width: 2),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: colorScheme.surface,
         contentPadding: const EdgeInsets.all(16),
       ),
       validator: validator,

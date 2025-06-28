@@ -13,6 +13,8 @@ class CourseCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final asyncAvg = ref.watch(averageRatingProvider(course['id']));
     final asyncTopicCount = ref.watch(topicCountProvider(course['id']));
 
@@ -27,11 +29,12 @@ class CourseCard extends ConsumerWidget {
         elevation: 4,
         margin: const EdgeInsets.only(right: 16.0, bottom: 8.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        color: colorScheme.surface,
         child: Container(
           width: 200,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            color: Colors.white,
+            color: colorScheme.surface,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,18 +55,21 @@ class CourseCard extends ConsumerWidget {
                       placeholder:
                           (context, url) => Container(
                             height: 120,
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                            color: colorScheme.surfaceContainerHighest,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.primary,
+                              ),
                             ),
                           ),
                       errorWidget:
                           (context, url, error) => Container(
                             height: 120,
-                            color: Colors.grey[200],
+                            color: colorScheme.surfaceContainerHighest,
                             child: Icon(
                               Icons.broken_image,
-                              color: Colors.grey[400],
+                              color: colorScheme.onSurface.withOpacity(0.4),
                             ),
                           ),
                     ),
@@ -74,13 +80,20 @@ class CourseCard extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         shape: BoxShape.circle,
                         boxShadow: [
-                          BoxShadow(color: Colors.black26, blurRadius: 4),
+                          BoxShadow(
+                            color: colorScheme.shadow.withOpacity(0.3), 
+                            blurRadius: 4
+                          ),
                         ],
                       ),
-                      child: const Icon(Icons.favorite_border, size: 18),
+                      child: Icon(
+                        Icons.favorite_border, 
+                        size: 18,
+                        color: colorScheme.onSurface.withOpacity(0.6),
+                      ),
                     ),
                   ),
                 ],
@@ -104,7 +117,7 @@ class CourseCard extends ConsumerWidget {
                                     ...List.generate(5, (index) {
                                       if (index < avg.floor()) {
                                         // Bintang penuh
-                                        return Icon(
+                                        return const Icon(
                                           Icons.star,
                                           color: Colors.amber,
                                           size: 16,
@@ -112,7 +125,7 @@ class CourseCard extends ConsumerWidget {
                                       } else if (index < avg &&
                                           avg - index >= 0.5) {
                                         // Bintang setengah
-                                        return Icon(
+                                        return const Icon(
                                           Icons.star_half,
                                           color: Colors.amber,
                                           size: 16,
@@ -120,7 +133,7 @@ class CourseCard extends ConsumerWidget {
                                       } else {
                                         return Icon(
                                           Icons.star_border,
-                                          color: Colors.grey[400],
+                                          color: colorScheme.onSurface.withOpacity(0.4),
                                           size: 16,
                                         );
                                       }
@@ -128,9 +141,10 @@ class CourseCard extends ConsumerWidget {
                                     const SizedBox(width: 4),
                                     Text(
                                       avg.toStringAsFixed(1),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
+                                        color: colorScheme.onSurface,
                                       ),
                                     ),
                                   ],
@@ -142,16 +156,17 @@ class CourseCard extends ConsumerWidget {
                                       5,
                                       (index) => Icon(
                                         Icons.star_border,
-                                        color: Colors.grey[300],
+                                        color: colorScheme.onSurface.withOpacity(0.3),
                                         size: 16,
                                       ),
                                     ),
                                     const SizedBox(width: 4),
-                                    const SizedBox(
+                                    SizedBox(
                                       width: 12,
                                       height: 12,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 1,
+                                        color: colorScheme.primary,
                                       ),
                                     ),
                                   ],
@@ -163,14 +178,17 @@ class CourseCard extends ConsumerWidget {
                                       5,
                                       (index) => Icon(
                                         Icons.star_border,
-                                        color: Colors.grey[400],
+                                        color: colorScheme.onSurface.withOpacity(0.4),
                                         size: 16,
                                       ),
                                     ),
                                     const SizedBox(width: 4),
-                                    const Text(
+                                    Text(
                                       '0.0',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: colorScheme.onSurface,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -182,22 +200,34 @@ class CourseCard extends ConsumerWidget {
                         data:
                             (topic) => Text(
                               '${topic.toInt()} lessons',
-                              style: TextStyle(fontSize: 12),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: colorScheme.onSurface.withOpacity(0.6),
+                              ),
                             ),
                         loading:
-                            () => const SizedBox(
+                            () => SizedBox(
                               width: 10,
                               height: 10,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.primary,
+                              ),
                             ),
-                        error: (_, __) => const Text('0 lessons'),
+                        error: (_, __) => Text(
+                          '0 lessons',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         course['title'] ?? 'Tanpa Judul',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: colorScheme.onSurface,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -211,13 +241,13 @@ class CourseCard extends ConsumerWidget {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
+                              color: colorScheme.secondaryContainer,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               'Rp ${_formatPrice(course['price'])}',
                               style: TextStyle(
-                                color: Colors.green[700],
+                                color: colorScheme.onSecondaryContainer,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
