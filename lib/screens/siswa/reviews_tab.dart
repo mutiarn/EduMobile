@@ -350,7 +350,7 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Belum ada review untuk kursus ini',
+                            'No reviews for this course yet',
                             style: TextStyle(
                               color: theme.textTheme.bodyMedium?.color,
                               fontSize: 16,
@@ -377,7 +377,7 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
                 if (user == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Silakan login untuk menulis review.'),
+                      content: Text('Please log in to write a review.'),
                     ),
                   );
                   return;
@@ -394,7 +394,7 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
                       await _fetchReviews();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("Review berhasil dikirim."),
+                          content: Text("Review submitted successfully."),
                           backgroundColor: Colors.green,
                         ),
                       );
@@ -405,7 +405,7 @@ class _ReviewsTabState extends ConsumerState<ReviewsTab> {
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
               icon: const Icon(Icons.rate_review),
-              label: const Text("Tulis Review"),
+              label: const Text("Add Review"),
             ),
           ),
       ],

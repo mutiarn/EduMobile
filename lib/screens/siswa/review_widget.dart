@@ -26,17 +26,17 @@ class _ReviewFormState extends State<ReviewForm> {
   String _getRatingText(int rating) {
     switch (rating) {
       case 1:
-        return 'Sangat Buruk';
+        return 'Very Bad';
       case 2:
-        return 'Buruk';
+        return 'Bad';
       case 3:
-        return 'Cukup';
+        return 'Fair';
       case 4:
-        return 'Baik';
+        return 'Good';
       case 5:
-        return 'Sangat Baik';
+        return 'Very Good';
       default:
-        return 'Pilih Rating';
+        return 'Select Rating';
     }
   }
 
@@ -61,7 +61,7 @@ class _ReviewFormState extends State<ReviewForm> {
     if (_commentController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Silakan tulis komentar Anda'),
+          content: Text('Please write your comment'),
           backgroundColor: Colors.red,
         ),
       );
@@ -86,7 +86,7 @@ class _ReviewFormState extends State<ReviewForm> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Gagal mengirim review: $e'),
+          content: Text('Failed to submit review: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -115,7 +115,7 @@ class _ReviewFormState extends State<ReviewForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Tulis Review',
+            'Write a Review',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -123,7 +123,7 @@ class _ReviewFormState extends State<ReviewForm> {
             ),
           ),
           const SizedBox(height: 20),
-          
+
           Text(
             'Rating',
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
@@ -166,10 +166,10 @@ class _ReviewFormState extends State<ReviewForm> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 20),
           Text(
-            'Komentar',
+            'Comment',
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(height: 8),
@@ -178,7 +178,7 @@ class _ReviewFormState extends State<ReviewForm> {
             maxLines: 4,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             decoration: InputDecoration(
-              hintText: 'Tulis pengalaman Anda...',
+              hintText: 'Write your experience...',
               hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
               border: OutlineInputBorder(
                 borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
@@ -191,7 +191,7 @@ class _ReviewFormState extends State<ReviewForm> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
@@ -207,7 +207,7 @@ class _ReviewFormState extends State<ReviewForm> {
                       color: Theme.of(context).colorScheme.onPrimary,
                     )
                   : Text(
-                      'Kirim Review',
+                      'Submit Review',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
