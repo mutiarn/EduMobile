@@ -153,7 +153,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                       },
                       style: TextStyle(color: colorScheme.onSurface),
                       decoration: InputDecoration(
-                        hintText: 'Cari kursus Anda...',
+                        hintText: 'Search your courses...',
                         hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
                         prefixIcon: Icon(
                           Icons.search,

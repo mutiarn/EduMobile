@@ -1,7 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mobile_edu/components/theme_toggle_button.dart';
+
+// Custom TextInputFormatter for Indonesian Rupiah
+class CurrencyInputFormatter extends TextInputFormatter {
+  final NumberFormat _formatter = NumberFormat.currency(
+    locale: 'id_ID',
+    symbol: '',
+    decimalDigits: 0,
+  );
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    // Remove all non-digit characters
+    String digitsOnly = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+    
+    if (digitsOnly.isEmpty) {
+      return const TextEditingValue();
+    }
+
+    // Parse as number and format
+    final number = int.tryParse(digitsOnly) ?? 0;
+    final formatted = _formatter.format(number);
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
 
 class CourseFormPage extends StatefulWidget {
   final Map<String, dynamic>? course;
@@ -31,7 +68,18 @@ class _CourseFormPageState extends State<CourseFormPage> {
     if (widget.course != null) {
       _titleController.text = widget.course!['title'] ?? '';
       _descController.text = widget.course!['description'] ?? '';
-      _priceController.text = widget.course!['price'].toString();
+      
+      // Format price for display without decimal
+      final price = widget.course!['price'];
+      if (price != null) {
+        final formatter = NumberFormat.currency(
+          locale: 'id_ID',
+          symbol: '',
+          decimalDigits: 0,
+        );
+        _priceController.text = formatter.format(price);
+      }
+      
       _thumbController.text = widget.course!['thumbnail_url'] ?? '';
       _selectedCategory = widget.course!['category_id'];
     }
@@ -44,6 +92,15 @@ class _CourseFormPageState extends State<CourseFormPage> {
     });
   }
 
+  // Helper method to parse formatted price back to number
+  double _parsePriceFromFormatted(String formattedPrice) {
+    if (formattedPrice.isEmpty) return 0;
+    
+    // Remove all non-digit characters
+    String digitsOnly = formattedPrice.replaceAll(RegExp(r'[^\d]'), '');
+    return double.tryParse(digitsOnly) ?? 0;
+  }
+
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -52,7 +109,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
     final payload = {
       'title': _titleController.text.trim(),
       'description': _descController.text.trim(),
-      'price': double.tryParse(_priceController.text.trim()) ?? 0,
+      'price': _parsePriceFromFormatted(_priceController.text.trim()),
       'thumbnail_url': _thumbController.text.trim(),
       'category_id': _selectedCategory,
       'teacher_id': supa.auth.currentUser!.id,
@@ -227,18 +284,13 @@ class _CourseFormPageState extends State<CourseFormPage> {
 
                       const SizedBox(height: 24),
 
-                      // Price Field
+                      // Price Field with Currency Formatting
                       _buildSectionTitle(
                         'Price',
                         Icons.monetization_on_outlined,
                       ),
                       const SizedBox(height: 12),
-                      _buildTextField(
-                        controller: _priceController,
-                        label: 'Price (IDR)',
-                        icon: Icons.attach_money,
-                        keyboardType: TextInputType.number,
-                      ),
+                      _buildPriceField(),
 
                       const SizedBox(height: 24),
 
@@ -437,6 +489,65 @@ class _CourseFormPageState extends State<CourseFormPage> {
         contentPadding: const EdgeInsets.all(16),
       ),
       validator: validator,
+    );
+  }
+
+  Widget _buildPriceField() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return TextFormField(
+      controller: _priceController,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        CurrencyInputFormatter(),
+      ],
+      style: TextStyle(color: colorScheme.onSurface),
+      decoration: InputDecoration(
+        labelText: 'Harga Kursus',
+        labelStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+        prefixIcon: Icon(
+          Icons.attach_money,
+          color: theme.textTheme.bodyMedium?.color,
+        ),
+        prefixText: 'Rp ',
+        prefixStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontWeight: FontWeight.w500,
+        ),
+        hintText: '100.000',
+        hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        filled: true,
+        fillColor: colorScheme.surface,
+        contentPadding: const EdgeInsets.all(16),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Harga harus diisi';
+        }
+        final price = _parsePriceFromFormatted(value);
+        if (price <= 0) {
+          return 'Harga harus lebih dari 0';
+        }
+        return null;
+      },
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_edu/screens/course_form_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -88,9 +89,17 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
     }).toList();
   }
 
+  // Updated method to format price with ,00
   String _formatPrice(dynamic price) {
     if (price == null) return 'Free';
-    return 'Rp ${price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+    
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 2, // Show ,00 for Indonesian format
+    );
+    
+    return formatter.format(price);
   }
 
   @override
@@ -1003,7 +1012,7 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
               ],
             ),
 
-            // Bottom padding for safe area
+
             SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
           ],
         ),

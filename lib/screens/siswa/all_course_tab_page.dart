@@ -124,7 +124,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Urutkan berdasarkan',
+                    'Sort by',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurface,
@@ -135,14 +135,14 @@ class _AllCourseTabState extends State<AllCourseTab>
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _buildSortChip('Terbaru', 'newest', tempSortBy, (val) {
+                      _buildSortChip('Newest', 'newest', tempSortBy, (val) {
                         setModalState(() => tempSortBy = val);
                       }),
-                      _buildSortChip('Terlama', 'oldest', tempSortBy, (val) {
+                      _buildSortChip('Oldest', 'oldest', tempSortBy, (val) {
                         setModalState(() => tempSortBy = val);
                       }),
                       _buildSortChip(
-                        'Harga Terendah',
+                        'Low to High',
                         'price_low',
                         tempSortBy,
                         (val) {
@@ -150,14 +150,14 @@ class _AllCourseTabState extends State<AllCourseTab>
                         },
                       ),
                       _buildSortChip(
-                        'Harga Tertinggi',
+                        'High to Low',
                         'price_high',
                         tempSortBy,
                         (val) {
                           setModalState(() => tempSortBy = val);
                         },
                       ),
-                      _buildSortChip('Terpopuler', 'popular', tempSortBy, (
+                      _buildSortChip('Most Popular', 'popular', tempSortBy, (
                         val,
                       ) {
                         setModalState(() => tempSortBy = val);
@@ -285,7 +285,7 @@ class _AllCourseTabState extends State<AllCourseTab>
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  // Search Bar - Updated styling to match course_tab
+                  // Search Bar
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
@@ -311,7 +311,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                       },
                       style: TextStyle(color: colorScheme.onSurface),
                       decoration: InputDecoration(
-                        hintText: 'Cari kursus impian Anda...',
+                        hintText: 'Search your ideal course...',
                         hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
                         prefixIcon: Icon(
                           Icons.search,
@@ -403,7 +403,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                       const SizedBox(width: 12),
                       Row(
                         children: [
-                          // Filter Button - Updated styling
+                          // Filter Button
                           Container(
                             decoration: BoxDecoration(
                               color: colorScheme.surface,
@@ -426,7 +426,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          // View Toggle Button - Updated styling
+                          // View Toggle Button
                           Container(
                             decoration: BoxDecoration(
                               color: colorScheme.surface,
@@ -548,7 +548,11 @@ class _AllCourseTabState extends State<AllCourseTab>
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       child: FilterChip(
-        label: Text(text),
+        label: Text(
+          text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         selected: isSelected,
         showCheckmark: false,
         onSelected: (selected) {
@@ -588,7 +592,7 @@ class _AllCourseTabState extends State<AllCourseTab>
       padding: const EdgeInsets.all(16.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.6,
+        childAspectRatio: 0.65, // Adjusted for better text space
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
@@ -699,7 +703,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        course['title'],
+                        course['title'] ?? 'No Title',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
@@ -717,46 +721,58 @@ class _AllCourseTabState extends State<AllCourseTab>
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'Rp ${_formatPrice(course['price'])}',
-                          style: TextStyle(
-                            color: colorScheme.onSecondaryContainer,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 12),
-                      if (course['category_course'] != null &&
-                          course['category_course']['name'] != null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            course['category_course']['name'],
-                            style: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.secondaryContainer,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'Rp ${_formatPrice(course['price'])}',
+                                style: TextStyle(
+                                  color: colorScheme.onSecondaryContainer,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          if (course['category_course'] != null &&
+                              course['category_course']['name'] != null)
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primaryContainer,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  course['category_course']['name'],
+                                  style: TextStyle(
+                                    color: colorScheme.onPrimaryContainer,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -856,49 +872,54 @@ class _AllCourseTabState extends State<AllCourseTab>
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        course['title'],
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
+                      Flexible(
+                        child: Text(
+                          course['title'] ?? 'No Title',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                          horizontal: 10,
+                          vertical: 6,
                         ),
                         decoration: BoxDecoration(
                           color: colorScheme.secondaryContainer.withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           'Rp ${_formatPrice(course['price'])}',
                           style: TextStyle(
                             color: colorScheme.onSecondaryContainer,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                           textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      const Spacer(),
+                      const SizedBox(height: 6),
                       if (course['category_course'] != null &&
                           course['category_course']['name'] != null)
                         Container(
+                          width: double.infinity,
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                            horizontal: 6,
+                            vertical: 3,
                           ),
                           decoration: BoxDecoration(
                             color: colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             course['category_course']['name'],
@@ -909,6 +930,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
                           ),
                         ),
                     ],

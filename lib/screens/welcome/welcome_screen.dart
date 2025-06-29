@@ -177,10 +177,26 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Container(
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 50),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                    color: primaryColor.withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
               child: SlideAction(
                 height: 64,
                 borderRadius: 32,
                 elevation: 0,
+                sliderButtonYOffset: -2,
+                submittedIcon: const Icon(
+                  Icons.check,
+                  color: Color(0xFF6B73FF),
+                  size: 24,
+                ),
                 text: 'Slide to Start Learning',
                 textStyle: const TextStyle(
                   fontSize: 16,
@@ -190,10 +206,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 outerColor: primaryColor,
                 innerColor: Colors.white,
                 sliderButtonIcon: const Icon(
-                  Icons.arrow_forward, // arah panah
-                  color: Color(0xFF6B73FF), // ungu
+                  Icons.arrow_forward,
+                  color: Color(0xFF6B73FF),
                   size: 24,
                 ),
+                sliderRotate: false,
                 animationDuration: const Duration(milliseconds: 300),
                 onSubmit: () {
                   Navigator.push(

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_edu/screens/course_form_page.dart';
 import 'package:mobile_edu/screens/topic_list_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -97,6 +98,19 @@ class _ManageCourseTabState extends State<ManageCourseTab>
         .eq('course_id', courseId);
 
     return data.length;
+  }
+
+  // Helper method to format price in Indonesian Rupiah with ,00
+  String _formatPrice(dynamic price) {
+    if (price == null) return 'Rp 0,00';
+    
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 2, // Ubah dari 0 menjadi 2 untuk menampilkan ,00
+    );
+    
+    return formatter.format(price);
   }
 
   @override
@@ -742,7 +756,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        'Rp ${course['price'] ?? '0'}',
+                        _formatPrice(course['price']),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -945,7 +959,7 @@ class _ManageCourseTabState extends State<ManageCourseTab>
                 Row(
                   children: [
                     Text(
-                      'Rp ${course['price'] ?? '0'}',
+                      _formatPrice(course['price']),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
