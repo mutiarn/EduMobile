@@ -23,6 +23,8 @@ class _AllCourseTabState extends State<AllCourseTab>
   late Future<List<dynamic>> _coursesFuture;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -43,6 +45,7 @@ class _AllCourseTabState extends State<AllCourseTab>
   @override
   void dispose() {
     _animationController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -59,7 +62,6 @@ class _AllCourseTabState extends State<AllCourseTab>
       query = query.eq('category_id', _selectedCategory!);
     }
 
-    // Apply sorting
     switch (_sortBy) {
       case 'newest':
         _coursesFuture = query.order('created_at', ascending: false);
@@ -74,7 +76,6 @@ class _AllCourseTabState extends State<AllCourseTab>
         _coursesFuture = query.order('price', ascending: false);
         break;
       case 'popular':
-        // Static implementation - you can add enrollment_count to backend later
         _coursesFuture = query.order('created_at', ascending: false);
         break;
     }
@@ -91,7 +92,7 @@ class _AllCourseTabState extends State<AllCourseTab>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        String tempSortBy = _sortBy; // ← buffer state lokal
+        String tempSortBy = _sortBy;
 
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -170,7 +171,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                       onPressed: () {
                         setState(
                           () => _sortBy = tempSortBy,
-                        ); // ← Simpan perubahan
+                        );
                         Navigator.pop(context);
                         _fetchCourses();
                       },
@@ -216,7 +217,7 @@ class _AllCourseTabState extends State<AllCourseTab>
       child: FilterChip(
         label: Text(text),
         selected: isSelected,
-        showCheckmark: false, // Remove checkmark
+        showCheckmark: false,
         onSelected: (_) => onSelected(value),
         backgroundColor: colorScheme.surfaceContainerHighest,
         selectedColor: colorScheme.primary,
@@ -237,7 +238,7 @@ class _AllCourseTabState extends State<AllCourseTab>
     final colorScheme = theme.colorScheme;
     
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: colorScheme.background,
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
@@ -250,7 +251,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF7475d6), // Preserve this color
+                    Color(0xFF7475d6),
                     Color.fromARGB(255, 161, 161, 212),
                   ],
                 ),
@@ -280,174 +281,185 @@ class _AllCourseTabState extends State<AllCourseTab>
                 ),
               ),
             ),
-            Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.shadow.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    // Search Bar with enhanced design
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: colorScheme.surfaceContainerHighest,
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.shadow.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            _searchQuery = value;
-                          });
-                          // Debounce search
-                          Future.delayed(const Duration(milliseconds: 500), () {
-                            if (_searchQuery == value) {
-                              _fetchCourses();
-                            }
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Cari kursus impian Anda...',
-                          hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.5)),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                          suffixIcon:
-                              _searchQuery.isNotEmpty
-                                  ? IconButton(
-                                    icon: Icon(
-                                      Icons.clear,
-                                      color: colorScheme.onSurface.withOpacity(0.6),
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _searchQuery = '';
-                                        _fetchCourses();
-                                      });
-                                    },
-                                  )
-                                  : null,
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Filter and View Toggle Row
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FutureBuilder<List<dynamic>>(
-                            future: _categoriesFuture,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return SizedBox(
-                                  height: 40,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: colorScheme.primary,
-                                    ),
-                                  ),
-                                );
-                              }
-                              if (snapshot.hasError || !snapshot.hasData) {
-                                return const SizedBox.shrink();
-                              }
-
-                              final categories = snapshot.data!;
-                              return SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: [
-                                    _buildCategoryChip('Semua', null),
-                                    const SizedBox(width: 8),
-                                    ...categories.map(
-                                      (category) => Padding(
-                                        padding: const EdgeInsets.only(
-                                          right: 8,
-                                        ),
-                                        child: _buildCategoryChip(
-                                          category['name'],
-                                          category['id'],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Row(
-                          children: [
-                            // Filter Button
-                            Container(
-                              decoration: BoxDecoration(
-                                color: colorScheme.primaryContainer,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: IconButton(
-                                onPressed: _showFilterBottomSheet,
-                                icon: Icon(
-                                  Icons.tune,
-                                  color: colorScheme.primary,
-                                ),
-                                tooltip: 'Filter',
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            // View Toggle Button
-                            Container(
-                              decoration: BoxDecoration(
-                                color: colorScheme.primaryContainer,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _isGridView = !_isGridView;
-                                  });
-                                },
-                                icon: Icon(
-                                  _isGridView ? Icons.list : Icons.grid_view,
-                                  color: colorScheme.primary,
-                                ),
-                                tooltip:
-                                    _isGridView
-                                        ? 'Tampilan List'
-                                        : 'Tampilan Grid',
-                              ),
-                            ),
-                          ],
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Search Bar - Updated styling to match course_tab
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                  ],
-                ),
+                    child: TextField(
+                      focusNode: _searchFocusNode,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                        Future.delayed(const Duration(milliseconds: 500), () {
+                          if (_searchQuery == value) {
+                            _fetchCourses();
+                          }
+                        });
+                      },
+                      style: TextStyle(color: colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        hintText: 'Cari kursus impian Anda...',
+                        hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: theme.textTheme.bodyMedium?.color,
+                        ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                  color: theme.textTheme.bodyMedium?.color,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _searchQuery = '';
+                                    _fetchCourses();
+                                  });
+                                },
+                              )
+                            : null,
+                        filled: true,
+                        fillColor: colorScheme.surface,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(
+                            color: colorScheme.primary,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Filter and View Toggle Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FutureBuilder<List<dynamic>>(
+                          future: _categoriesFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return SizedBox(
+                                height: 40,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                              );
+                            }
+                            if (snapshot.hasError || !snapshot.hasData) {
+                              return const SizedBox.shrink();
+                            }
+
+                            final categories = snapshot.data!;
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  _buildCategoryChip('Semua', null),
+                                  const SizedBox(width: 8),
+                                  ...categories.map(
+                                    (category) => Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 8,
+                                      ),
+                                      child: _buildCategoryChip(
+                                        category['name'],
+                                        category['id'],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Row(
+                        children: [
+                          // Filter Button - Updated styling
+                          Container(
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              onPressed: _showFilterBottomSheet,
+                              icon: Icon(
+                                Icons.tune,
+                                color: colorScheme.primary,
+                              ),
+                              tooltip: 'Filter',
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // View Toggle Button - Updated styling
+                          Container(
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isGridView = !_isGridView;
+                                });
+                              },
+                              icon: Icon(
+                                _isGridView ? Icons.list : Icons.grid_view,
+                                color: colorScheme.primary,
+                              ),
+                              tooltip:
+                                  _isGridView
+                                      ? 'Tampilan List'
+                                      : 'Tampilan Grid',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             Expanded(
@@ -538,7 +550,7 @@ class _AllCourseTabState extends State<AllCourseTab>
       child: FilterChip(
         label: Text(text),
         selected: isSelected,
-        showCheckmark: false, // Remove checkmark
+        showCheckmark: false,
         onSelected: (selected) {
           setState(() {
             _selectedCategory = selected ? categoryId : null;
@@ -549,7 +561,9 @@ class _AllCourseTabState extends State<AllCourseTab>
         selectedColor: colorScheme.primary,
         checkmarkColor: colorScheme.onPrimary,
         labelStyle: TextStyle(
-          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface.withOpacity(0.7),
+          color: isSelected 
+              ? colorScheme.onPrimary 
+              : colorScheme.onSurface.withOpacity(0.7),
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -589,6 +603,7 @@ class _AllCourseTabState extends State<AllCourseTab>
   Widget _buildCourseCard(Map<String, dynamic> course, int index) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     
     return AnimatedContainer(
       duration: Duration(milliseconds: 300 + (index * 100)),
@@ -606,7 +621,7 @@ class _AllCourseTabState extends State<AllCourseTab>
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.shadow.withOpacity(0.1),
+                color: Colors.black.withOpacity(0.1),
                 spreadRadius: 2,
                 blurRadius: 15,
                 offset: const Offset(0, 5),
@@ -634,7 +649,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                                     height: 100,
                                     width: 100,
                                     decoration: BoxDecoration(
-                                      color: colorScheme.surfaceContainerHighest,
+                                      color: isDark ? Colors.grey[800] : Colors.grey[200],
                                       borderRadius: BorderRadius.circular(15),
                                     ),
                                     child: Center(
@@ -649,12 +664,12 @@ class _AllCourseTabState extends State<AllCourseTab>
                                     height: 100,
                                     width: 100,
                                     decoration: BoxDecoration(
-                                      color: colorScheme.surfaceContainerHighest,
+                                      color: isDark ? Colors.grey[800] : Colors.grey[200],
                                       borderRadius: BorderRadius.circular(15),
                                     ),
                                     child: Icon(
                                       Icons.broken_image,
-                                      color: colorScheme.onSurface.withOpacity(0.4),
+                                      color: isDark ? Colors.grey[600] : Colors.grey[400],
                                       size: 32,
                                     ),
                                   ),
@@ -664,16 +679,15 @@ class _AllCourseTabState extends State<AllCourseTab>
                               width: 100,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
-                                  colors: [
-                                    colorScheme.primary.withOpacity(0.7),
-                                    colorScheme.primary.withOpacity(0.5),
-                                  ],
+                                  colors: isDark
+                                      ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                                      : [colorScheme.primary, const Color(0xFF4a5394)],
                                 ),
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Icon(
                                 Icons.school,
-                                color: colorScheme.onPrimary,
+                                color: Colors.white,
                                 size: 32,
                               ),
                             ),
@@ -697,36 +711,32 @@ class _AllCourseTabState extends State<AllCourseTab>
                       Text(
                         course['description'] ?? 'Tidak ada deskripsi.',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.textTheme.bodyMedium?.color,
                           height: 1.4,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.secondaryContainer,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              'Rp ${_formatPrice(course['price'])}',
-                              style: TextStyle(
-                                color: colorScheme.onSecondaryContainer,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Rp ${_formatPrice(course['price'])}',
+                          style: TextStyle(
+                            color: colorScheme.onSecondaryContainer,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
                           ),
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       if (course['category_course'] != null &&
                           course['category_course']['name'] != null)
                         Container(
@@ -741,7 +751,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                           child: Text(
                             course['category_course']['name'],
                             style: TextStyle(
-                              color: colorScheme.primary,
+                              color: colorScheme.onPrimaryContainer,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -761,6 +771,7 @@ class _AllCourseTabState extends State<AllCourseTab>
   Widget _buildGridCourseCard(Map<String, dynamic> course, int index) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     
     return AnimatedContainer(
       duration: Duration(milliseconds: 300 + (index * 50)),
@@ -777,7 +788,7 @@ class _AllCourseTabState extends State<AllCourseTab>
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.shadow.withOpacity(0.1),
+                color: Colors.black.withOpacity(0.1),
                 spreadRadius: 2,
                 blurRadius: 15,
                 offset: const Offset(0, 5),
@@ -803,7 +814,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                               fit: BoxFit.cover,
                               placeholder:
                                   (context, url) => Container(
-                                    color: colorScheme.surfaceContainerHighest,
+                                    color: isDark ? Colors.grey[800] : Colors.grey[200],
                                     child: Center(
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
@@ -813,10 +824,10 @@ class _AllCourseTabState extends State<AllCourseTab>
                                   ),
                               errorWidget:
                                   (context, url, error) => Container(
-                                    color: colorScheme.surfaceContainerHighest,
+                                    color: isDark ? Colors.grey[800] : Colors.grey[200],
                                     child: Icon(
                                       Icons.broken_image,
-                                      color: colorScheme.onSurface.withOpacity(0.4),
+                                      color: isDark ? Colors.grey[600] : Colors.grey[400],
                                       size: 32,
                                     ),
                                   ),
@@ -825,15 +836,14 @@ class _AllCourseTabState extends State<AllCourseTab>
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
-                                  colors: [
-                                    colorScheme.primary.withOpacity(0.7),
-                                    colorScheme.primary.withOpacity(0.5),
-                                  ],
+                                  colors: isDark
+                                      ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                                      : [colorScheme.primary, const Color(0xFF4a5394)],
                                 ),
                               ),
                               child: Icon(
                                 Icons.school,
-                                color: colorScheme.onPrimary,
+                                color: Colors.white,
                                 size: 40,
                               ),
                             ),
@@ -856,15 +866,28 @@ class _AllCourseTabState extends State<AllCourseTab>
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Rp ${_formatPrice(course['price'])}',
-                        style: TextStyle(
-                          color: colorScheme.onSecondaryContainer,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.secondaryContainer.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          'Rp ${_formatPrice(course['price'])}',
+                          style: TextStyle(
+                            color: colorScheme.onSecondaryContainer,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
+                      const SizedBox(height: 8),
                       const Spacer(),
                       if (course['category_course'] != null &&
                           course['category_course']['name'] != null)
@@ -880,7 +903,7 @@ class _AllCourseTabState extends State<AllCourseTab>
                           child: Text(
                             course['category_course']['name'],
                             style: TextStyle(
-                              color: colorScheme.primary,
+                              color: colorScheme.onPrimaryContainer,
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                             ),
@@ -904,8 +927,7 @@ class _AllCourseTabState extends State<AllCourseTab>
 
     final formatter = NumberFormat.currency(
       locale: 'id_ID',
-      symbol:
-          '', // Tidak pakai Rp di sini, bisa kamu tambahkan di UI kalau perlu
+      symbol: '',
       decimalDigits: 2,
     );
 

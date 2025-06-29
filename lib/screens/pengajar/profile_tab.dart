@@ -146,76 +146,79 @@ class _ProfileTabState extends State<ProfileTab> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      children: [
-                        _buildMenuItem(
-                          icon: Icons.person_outline,
-                          title: 'My Profile',
-                          onTap: () {},
-                        ),
-                        const SizedBox(height: 16),
-                        _buildMenuItem(
-                          icon: Icons.message_outlined,
-                          title: 'Messages',
-                          hasNotification: true,
-                          onTap: () {},
-                        ),
-                        const SizedBox(height: 16),
-                        _buildMenuItem(
-                          icon: Icons.favorite_outline,
-                          title: 'Favorites',
-                          onTap: () {},
-                        ),
-                        const SizedBox(height: 16),
-                        _buildMenuItem(
-                          icon: Icons.location_on_outlined,
-                          title: 'Location',
-                          onTap: () {},
-                        ),
-                        const SizedBox(height: 16),
-                        _buildMenuItem(
-                          icon: Icons.settings_outlined,
-                          title: 'Settings',
-                          onTap: () {},
-                        ),
-                        const Spacer(),
-                        SizedBox(
-                          width: double.infinity,
-                          child: TextButton.icon(
-                            onPressed: () async {
-                              await Supabase.instance.client.auth.signOut();
-                              if (context.mounted) {
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const LoginPage(),
-                                  ),
-                                  (route) => false,
-                                );
-                              }
-                            },
-                            icon: const Icon(
-                              Icons.logout,
-                              color: Color(0xFFd32f2f),
-                            ),
-                            label: const Text(
-                              'Logout',
-                              style: TextStyle(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildMenuItem(
+                            icon: Icons.person_outline,
+                            title: 'My Profile',
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 16),
+                          _buildMenuItem(
+                            icon: Icons.message_outlined,
+                            title: 'Messages',
+                            hasNotification: true,
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 16),
+                          _buildMenuItem(
+                            icon: Icons.favorite_outline,
+                            title: 'Favorites',
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 16),
+                          _buildMenuItem(
+                            icon: Icons.location_on_outlined,
+                            title: 'Location',
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 16),
+                          _buildMenuItem(
+                            icon: Icons.settings_outlined,
+                            title: 'Settings',
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 40),
+                          SizedBox(
+                            width: double.infinity,
+                            child: TextButton.icon(
+                              onPressed: () async {
+                                await Supabase.instance.client.auth.signOut();
+                                if (context.mounted) {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const LoginPage(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.logout,
                                 color: Color(0xFFd32f2f),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
                               ),
-                            ),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                              label: const Text(
+                                'Logout',
+                                style: TextStyle(
+                                  color: Color(0xFFd32f2f),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                              foregroundColor: const Color(0xFFd32f2f),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                foregroundColor: const Color(0xFFd32f2f),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -243,25 +246,45 @@ class _ProfileTabState extends State<ProfileTab> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         decoration: BoxDecoration(
-          color: isDark ? colorScheme.background : Colors.grey.shade50,
+          color: isDark 
+              ? colorScheme.surfaceContainer
+              : Colors.white,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isDark 
+                ? colorScheme.outline.withOpacity(0.2)
+                : Colors.grey.withOpacity(0.2),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isDark 
+                  ? Colors.black.withOpacity(0.2)
+                  : Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: colorScheme.surface,
+                color: isDark 
+                    ? colorScheme.primaryContainer.withOpacity(0.3)
+                    : colorScheme.primaryContainer.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                border: Border.all(
+                  color: colorScheme.primary.withOpacity(0.2),
+                  width: 1,
+                ),
               ),
-              child: Icon(icon, color: theme.textTheme.bodyMedium?.color, size: 20),
+              child: Icon(
+                icon, 
+                color: colorScheme.primary, 
+                size: 20
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -278,15 +301,15 @@ class _ProfileTabState extends State<ProfileTab> {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF8B5CF6),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
                   shape: BoxShape.circle,
                 ),
               ),
             const SizedBox(width: 8),
             Icon(
               Icons.arrow_forward_ios,
-              color: theme.textTheme.bodyMedium?.color,
+              color: colorScheme.onSurfaceVariant,
               size: 16,
             ),
           ],

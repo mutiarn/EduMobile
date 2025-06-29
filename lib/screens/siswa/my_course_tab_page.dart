@@ -19,6 +19,7 @@ class _MyCourseTabState extends State<MyCourseTab>
   late Animation<double> _fadeAnimation;
   String _searchQuery = '';
   bool _isGridView = false;
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _MyCourseTabState extends State<MyCourseTab>
   @override
   void dispose() {
     _animationController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -69,9 +71,10 @@ class _MyCourseTabState extends State<MyCourseTab>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainerHighest,
+      backgroundColor: colorScheme.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -88,7 +91,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color(0xFF7475d6), // Preserve this color
+                      Color(0xFF7475d6),
                       Color.fromARGB(255, 161, 161, 212),
                     ],
                   ),
@@ -129,23 +132,26 @@ class _MyCourseTabState extends State<MyCourseTab>
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
+                  // Search Bar - Updated styling to match course_tab
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: colorScheme.shadow.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 2),
                         ),
                       ],
                     ),
                     child: TextField(
+                      focusNode: _searchFocusNode,
                       onChanged: (value) {
                         setState(() {
                           _searchQuery = value;
                         });
                       },
+                      style: TextStyle(color: colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: 'Cari kursus Anda...',
                         hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
@@ -153,16 +159,28 @@ class _MyCourseTabState extends State<MyCourseTab>
                           Icons.search,
                           color: theme.textTheme.bodyMedium?.color,
                         ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                  color: theme.textTheme.bodyMedium?.color,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _searchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
                         filled: true,
-                        fillColor: colorScheme.surfaceContainerHighest,
+                        fillColor: colorScheme.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 15,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide.none, // hilangkan garis border default
+                          borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -183,7 +201,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
+                          color: colorScheme.onBackground,
                         ),
                       ),
                       Container(
@@ -192,7 +210,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: colorScheme.shadow.withOpacity(0.1),
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 5,
                               offset: const Offset(0, 2),
                             ),
@@ -208,10 +226,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                               },
                               icon: Icon(
                                 Icons.view_list,
-                                color:
-                                    !_isGridView
-                                        ? colorScheme.primary
-                                        : colorScheme.onSurface.withOpacity(0.6),
+                                color: !_isGridView ? colorScheme.primary : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                             IconButton(
@@ -222,10 +237,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                               },
                               icon: Icon(
                                 Icons.grid_view,
-                                color:
-                                    _isGridView
-                                        ? colorScheme.primary
-                                        : colorScheme.onSurface.withOpacity(0.6),
+                                color: _isGridView ? colorScheme.primary : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ],
@@ -252,7 +264,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                     height: 300,
                     margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: colorScheme.errorContainer,
+                      color: isDark ? Colors.red.withOpacity(0.1) : Colors.red[50],
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Center(
@@ -262,14 +274,14 @@ class _MyCourseTabState extends State<MyCourseTab>
                           Icon(
                             Icons.error_outline,
                             size: 60,
-                            color: colorScheme.error,
+                            color: Colors.red[400],
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Terjadi kesalahan',
                             style: TextStyle(
                               fontSize: 18,
-                              color: colorScheme.onErrorContainer,
+                              color: Colors.red[700],
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -278,7 +290,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                             'Error: ${snapshot.error}',
                             style: TextStyle(
                               fontSize: 14,
-                              color: colorScheme.onErrorContainer,
+                              color: Colors.red[600],
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -302,14 +314,14 @@ class _MyCourseTabState extends State<MyCourseTab>
                           Icon(
                             Icons.search_off,
                             size: 60,
-                            color: colorScheme.onSurface.withOpacity(0.4),
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Tidak ada kursus yang ditemukan',
                             style: TextStyle(
                               fontSize: 18,
-                              color: colorScheme.onSurface.withOpacity(0.6),
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -319,10 +331,9 @@ class _MyCourseTabState extends State<MyCourseTab>
                 }
                 return FadeTransition(
                   opacity: _fadeAnimation,
-                  child:
-                      _isGridView
-                          ? _buildGridView(filteredCourses)
-                          : _buildListView(filteredCourses),
+                  child: _isGridView
+                      ? _buildGridView(filteredCourses)
+                      : _buildListView(filteredCourses),
                 );
               },
             ),
@@ -335,6 +346,7 @@ class _MyCourseTabState extends State<MyCourseTab>
   Widget _buildEmptyState() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     
     return Container(
       height: 400,
@@ -344,7 +356,7 @@ class _MyCourseTabState extends State<MyCourseTab>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -359,14 +371,16 @@ class _MyCourseTabState extends State<MyCourseTab>
               height: 120,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [colorScheme.primary, colorScheme.secondary],
+                  colors: isDark
+                      ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                      : [colorScheme.primary, const Color(0xFF4a5394)],
                 ),
                 borderRadius: BorderRadius.circular(60),
               ),
               child: Icon(
                 Icons.school_outlined,
                 size: 60,
-                color: colorScheme.onPrimary,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 24),
@@ -381,10 +395,7 @@ class _MyCourseTabState extends State<MyCourseTab>
             const SizedBox(height: 8),
             Text(
               'Anda belum terdaftar di kursus apapun.',
-              style: TextStyle(
-                fontSize: 16, 
-                color: colorScheme.onSurface.withOpacity(0.6)
-              ),
+              style: TextStyle(fontSize: 16, color: theme.textTheme.bodyMedium?.color),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -419,9 +430,7 @@ class _MyCourseTabState extends State<MyCourseTab>
       itemBuilder: (context, index) {
         final enrollment = enrollments[index];
         final course = enrollment['course'];
-        // Check if progress exists in database, otherwise use static progress
-        final progress =
-            enrollment['progress'] ?? _generateStaticProgress(course);
+        final progress = enrollment['progress'] ?? _generateStaticProgress(course);
         return AnimatedContainer(
           duration: Duration(milliseconds: 300 + (index * 100)),
           margin: const EdgeInsets.only(bottom: 16),
@@ -447,9 +456,7 @@ class _MyCourseTabState extends State<MyCourseTab>
         itemBuilder: (context, index) {
           final enrollment = enrollments[index];
           final course = enrollment['course'];
-          // Check if progress exists in database, otherwise use static progress
-          final progress =
-              enrollment['progress'] ?? _generateStaticProgress(course);
+          final progress = enrollment['progress'] ?? _generateStaticProgress(course);
           return AnimatedContainer(
             duration: Duration(milliseconds: 300 + (index * 100)),
             child: _buildCourseCard(course, progress, true),
@@ -480,16 +487,15 @@ class _MyCourseTabState extends State<MyCourseTab>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow.withOpacity(0.1),
+              color: Colors.black.withOpacity(0.1),
               blurRadius: 15,
               offset: const Offset(0, 5),
             ),
           ],
         ),
-        child:
-            isGrid
-                ? _buildGridCard(course, progress)
-                : _buildListCard(course, progress),
+        child: isGrid
+            ? _buildGridCard(course, progress)
+            : _buildListCard(course, progress),
       ),
     );
   }
@@ -497,6 +503,7 @@ class _MyCourseTabState extends State<MyCourseTab>
   Widget _buildListCard(Map<String, dynamic> course, int progress) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     
     return SizedBox(
       height: 195,
@@ -508,57 +515,56 @@ class _MyCourseTabState extends State<MyCourseTab>
               tag: 'course_${course['id']}',
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child:
-                    course['thumbnail_url'] != null
-                        ? CachedNetworkImage(
-                          imageUrl: course['thumbnail_url'],
-                          height: 80,
-                          width: 80,
-                          fit: BoxFit.cover,
-                          placeholder:
-                              (context, url) => Container(
-                                height: 80,
-                                width: 80,
-                                decoration: BoxDecoration(
-                                  color: colorScheme.surfaceContainerHighest,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: colorScheme.primary,
-                                  ),
-                                ),
-                              ),
-                          errorWidget:
-                              (context, url, error) => Container(
-                                height: 80,
-                                width: 80,
-                                decoration: BoxDecoration(
-                                  color: colorScheme.surfaceContainerHighest,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Icon(
-                                  Icons.broken_image,
-                                  color: colorScheme.onSurface.withOpacity(0.4),
-                                ),
-                              ),
-                        )
-                        : Container(
+                child: course['thumbnail_url'] != null
+                    ? CachedNetworkImage(
+                        imageUrl: course['thumbnail_url'],
+                        height: 80,
+                        width: 80,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
                           height: 80,
                           width: 80,
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [colorScheme.primary, colorScheme.secondary],
+                            color: isDark ? Colors.grey[800] : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colorScheme.primary,
                             ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          height: 80,
+                          width: 80,
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.grey[800] : Colors.grey[200],
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Icon(
-                            Icons.play_circle_outline,
-                            color: colorScheme.onPrimary,
-                            size: 40,
+                            Icons.broken_image,
+                            color: isDark ? Colors.grey[600] : Colors.grey[400],
                           ),
                         ),
+                      )
+                    : Container(
+                        height: 80,
+                        width: 80,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: isDark
+                                ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                                : [colorScheme.primary, const Color(0xFF4a5394)],
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Icon(
+                          Icons.play_circle_outline,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(width: 16),
@@ -581,8 +587,8 @@ class _MyCourseTabState extends State<MyCourseTab>
                   Text(
                     course['description'] ?? 'No description available.',
                     style: TextStyle(
-                      fontSize: 14, 
-                      color: colorScheme.onSurface.withOpacity(0.6)
+                      fontSize: 14,
+                      color: theme.textTheme.bodyMedium?.color,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -592,8 +598,8 @@ class _MyCourseTabState extends State<MyCourseTab>
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: 12,
+                          vertical: 6,
                         ),
                         decoration: BoxDecoration(
                           color: colorScheme.secondaryContainer,
@@ -622,7 +628,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: progress / 100,
-                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    backgroundColor: Colors.grey[200],
                     valueColor: AlwaysStoppedAnimation<Color>(
                       colorScheme.primary,
                     ),
@@ -635,7 +641,7 @@ class _MyCourseTabState extends State<MyCourseTab>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
+                color: colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -653,6 +659,7 @@ class _MyCourseTabState extends State<MyCourseTab>
   Widget _buildGridCard(Map<String, dynamic> course, int progress) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -668,45 +675,44 @@ class _MyCourseTabState extends State<MyCourseTab>
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(20),
               ),
-              child:
-                  course['thumbnail_url'] != null
-                      ? CachedNetworkImage(
-                        imageUrl: course['thumbnail_url'],
-                        fit: BoxFit.cover,
-                        placeholder:
-                            (context, url) => Container(
-                              color: colorScheme.surfaceContainerHighest,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colorScheme.primary,
-                                ),
-                              ),
-                            ),
-                        errorWidget:
-                            (context, url, error) => Container(
-                              color: colorScheme.surfaceContainerHighest,
-                              child: Icon(
-                                Icons.broken_image,
-                                color: colorScheme.onSurface.withOpacity(0.4),
-                                size: 40,
-                              ),
-                            ),
-                      )
-                      : Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [colorScheme.primary, colorScheme.secondary],
-                          ),
-                        ),
+              child: course['thumbnail_url'] != null
+                  ? CachedNetworkImage(
+                      imageUrl: course['thumbnail_url'],
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: isDark ? Colors.grey[800] : Colors.grey[200],
                         child: Center(
-                          child: Icon(
-                            Icons.play_circle_outline,
-                            color: colorScheme.onPrimary,
-                            size: 50,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colorScheme.primary,
                           ),
                         ),
                       ),
+                      errorWidget: (context, url, error) => Container(
+                        color: isDark ? Colors.grey[800] : Colors.grey[200],
+                        child: Icon(
+                          Icons.broken_image,
+                          color: isDark ? Colors.grey[600] : Colors.grey[400],
+                          size: 40,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                              : [colorScheme.primary, const Color(0xFF4a5394)],
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.play_circle_outline,
+                          color: Colors.white,
+                          size: 50,
+                        ),
+                      ),
+                    ),
             ),
           ),
         ),
@@ -733,7 +739,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: colorScheme.onSecondaryContainer,
+                    color: colorScheme.primary,
                   ),
                 ),
                 const Spacer(),
@@ -746,7 +752,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                           'Progress',
                           style: TextStyle(
                             fontSize: 10,
-                            color: colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                         ),
                         Text(
@@ -762,7 +768,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                     const SizedBox(height: 7),
                     LinearProgressIndicator(
                       value: progress / 100,
-                      backgroundColor: colorScheme.surfaceContainerHighest,
+                      backgroundColor: Colors.grey[200],
                       valueColor: AlwaysStoppedAnimation<Color>(
                         colorScheme.primary,
                       ),
@@ -783,7 +789,7 @@ String _formatPrice(dynamic price) {
   if (price == null) return '0,00';
   final formatter = NumberFormat.currency(
     locale: 'id_ID',
-    symbol: '', // Tidak pakai Rp di sini, bisa kamu tambahkan di UI kalau perlu
+    symbol: '',
     decimalDigits: 2,
   );
   return formatter.format(price).trim();
